@@ -71,6 +71,8 @@ Fix #<issue-number>
 | Libraries via `loadScript()` | HIGH | Not in head.html |
 | Consider IntersectionObserver | MEDIUM | For heavy libraries |
 | aem.js unmodified | BLOCKING | Submit upstream PRs |
+| Block behavior lives in `blocks/{name}/{name}.js` | HIGH | No autoblock in `scripts.js` for something authors can author as a block |
+| Rows/cells named by role | MEDIUM | `{block}-{role}` classes via `block.children` (e.g. `hero-media`); content model documented in JSDoc; no `-wrapper`/`-container` suffix |
 | No new build steps | HIGH | Without team consensus |
 
 ### Code Patterns
@@ -135,7 +137,8 @@ element.disabled = true;
 |-------|----------|-------|
 | Single root rule `.block-name`, all rules nested inside | BLOCKING | `header`/`footer` blocks use their landmark element |
 | No `main` prefix on block selectors | BLOCKING | `main .block` should be `.block` |
-| Native nesting used correctly | MEDIUM | Max 3 levels; `&` for variants/states; no `&-suffix`; media queries nested in the rule they change |
+| Native nesting used correctly | MEDIUM | Max 3 levels; no `&-suffix`; media queries nested in the rule they change |
+| Every nested selector starts with `&` | MEDIUM | `& .item`, `& h2`, `&.dark`, `&:hover`; no bare `.item { }` / `h2 { }` / `> li { }` inside a rule (breaks editor highlighting) |
 | Prefixed private classes | MEDIUM | `block-name-private` |
 | Simple, readable selectors | MEDIUM | Add classes vs complex selectors |
 | ARIA attributes for states | LOW | `[aria-expanded="true"]` |
@@ -146,7 +149,7 @@ element.disabled = true;
 |-------|----------|-------|
 | Mobile-first approach | HIGH | Base = mobile, media queries for larger |
 | Standard breakpoints | HIGH | 600px, 900px, 1200px |
-| min-width only | MEDIUM | Don't mix with max-width |
+| min-width only (`width >= N`) | HIGH | Never `max-width`/`width <=`; media queries nested in the rule they change |
 | All viewports tested | HIGH | Mobile, tablet, desktop |
 
 ### Frameworks & Preprocessors
@@ -172,7 +175,7 @@ main .hero .title {
 
 /* PREFERRED: Block class root, nested */
 .hero {
-  .title {
+  & .title {
     font-size: 2rem;
   }
 }
@@ -185,7 +188,7 @@ main .hero .title {
 
 /* PREFERRED: Scoped, no !important */
 .hero {
-  .button {
+  & .button {
     background: blue;
     color: white;
   }
@@ -203,11 +206,16 @@ main .hero .title {
 .block {
   padding: 1rem; /* mobile */
 }
-@media (min-width: 600px) {
-  .block { padding: 1.5rem; }
-}
-@media (min-width: 900px) {
-  .block { padding: 2rem; }
+.block {
+  padding: 1rem; /* mobile */
+
+  @media (width >= 600px) {
+    padding: 1.5rem;
+  }
+
+  @media (width >= 900px) {
+    padding: 2rem;
+  }
 }
 
 /* ANTI-PATTERN: Complex, unreadable selectors */

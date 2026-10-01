@@ -152,6 +152,7 @@ export default async function decorate(block) {
 
 This is a document-based site: authors control text, links, images, and heading levels in DA. Your decorate function must **preserve** those semantics and **add** what a document cannot express.
 
+- **Name rows and cells by role** (`hero-media`, `hero-content`) with `block.children` and `classList.add`, and document the content model in the JSDoc. Block behavior belongs in the block's JS, not in an autoblock in `scripts.js`: do not autoblock what authors can author. See `references/js-guidelines.md`.
 - **Keep authored elements.** Move existing `h2`, `a`, `picture > img` nodes (see re-use pattern above). Never rebuild a link or heading from `textContent`; that discards alt text, `title`, and heading level.
 - **Never hard-code heading levels** that depend on position. Keep what the author wrote, and document the expected level in the content model.
 - **Never invent alt text** in JS. If an `img` has no `alt`, leave it and let accessibility-testing report it as a content fix in DA. Decorative imagery: empty `alt=""` authored in DA, or CSS background.
@@ -188,12 +189,12 @@ This is a document-based site: authors control text, links, images, and heading 
   padding: 1rem;
   flex-direction: column;
 
-  h2 {
+  & h2 {
     font-family: var(--heading-font-family);
     font-size: var(--heading-font-size-m);
   }
 
-  .item {
+  & .item {
     display: flex;
     gap: 1rem;
   }
@@ -217,7 +218,7 @@ This is a document-based site: authors control text, links, images, and heading 
 }
 ```
 
-Nesting rules: at most 3 levels, `&` for variants/states/pseudo-elements, media queries nested in the rule they change, one root rule per file (`header` and `footer` blocks use their landmark element as the root).
+Nesting rules: at most 3 levels, **every nested selector starts with `&`** (`& .item`, `& h2`, `&.dark`, `&:hover`; bare nested selectors break editor syntax highlighting), mobile-first with `min-width` range queries only (`@media (width >= 600px)`), media queries nested in the rule they change, one root rule per file (`header` and `footer` blocks use their landmark element as the root).
 
 **For complete CSS guidelines including:**
 - Block scoping and native nesting rules

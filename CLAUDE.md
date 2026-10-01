@@ -12,11 +12,17 @@ Any block, style, or script change follows the `content-driven-development` skil
 3. Keyboard/focus behavior was checked for interactive blocks
 4. Authoring-side problems (missing alt text, heading levels, link text) are reported as DA content fixes, never papered over in JS or by disabling axe rules
 
+## JS convention
+
+- Each block is `blocks/{name}/{name}.js` with `export default function decorate(block)` (async only if it awaits). Re-use authored elements; name rows/cells by role with `{block}-{role}` classes (`hero-media`, `hero-content`) via `block.children`; document the content model in the JSDoc.
+- Do not autoblock what authors can author as a block. `scripts.js` has no autoblocks (the hero is an authored block).
+
 ## CSS convention
 
 - Block CSS has **one top-level rule, the block class** (`.cards { ... }`), with everything nested inside it using native CSS nesting. `header`/`footer` blocks use their landmark element as the root.
 - **No `main` prefix** on block selectors.
-- Nest at most 3 levels; `&` for variants/states (`&.dark`, `&:hover`); media queries nested inside the rule they change; mobile-first.
+- Nest at most 3 levels. **Every nested selector starts with `&`**: `& .item`, `& h2`, `&.dark`, `&:hover` (bare nested selectors break editor syntax highlighting).
+- Mobile-first: base declarations are mobile; larger screens use nested `min-width` range queries only (`@media (width >= 900px)`), never `max-width`.
 - Details and examples: `.claude/skills/building-blocks/references/css-guidelines.md`. Existing boilerplate blocks predate this and are not yet converted.
 
 ## Commands

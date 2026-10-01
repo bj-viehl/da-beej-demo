@@ -113,6 +113,37 @@ newDiv.textContent = p.textContent;
 p.replaceWith(newDiv);
 ```
 
+### Name rows and cells by role
+
+Authored blocks arrive as bare `div > div > div` rows and cells. Give each row or cell a semantic class named `{block}-{role}` so CSS targets meaning, not position (`:first-child`, `> div > div`). Read the structure from `block.children` instead of `querySelector` hunts, and keep the authored elements untouched.
+
+```javascript
+/**
+ * Content model (2 rows, 1 cell each):
+ *   row 1: background image
+ *   row 2: content (heading, text, buttons)
+ * @param {Element} block the block
+ */
+export default function decorate(block) {
+  const [media, content] = block.children;
+  if (media) media.classList.add('hero-media');
+  if (content) content.classList.add('hero-content');
+}
+```
+
+- Document the content model (rows, cells, what goes where) in the JSDoc above `decorate`.
+- Destructure `block.children`; guard each row, because authors may omit one.
+- Class names are kebab-case, prefixed with the block name, and never end in `-wrapper` or `-container` (the platform uses those).
+- A synchronous `decorate` is fine (and preferred) when nothing is awaited; do not mark it `async` without a reason.
+
+### Author blocks; do not autoblock what authors can author
+
+This is a document-based site, so authors can place any block in DA. Put block behavior in `blocks/{name}/{name}.js`, not in `scripts/scripts.js`.
+
+- **Do not autoblock** (synthesize a block in `buildAutoBlocks`) for something an author can simply author as a block, such as a hero. Autoblocking guesses structure from page position (`first h1` + `first picture`), which breaks silently when the page changes.
+- **Autoblock only** to hide complexity from authors: patterns that are naturally default content or sections and are predictable (see `content-modeling`: Auto-Blocked model), or when blocks cannot be authored at all.
+- When a block replaces an autoblock, delete the autoblock code and its unused `aem.js` imports in the same change.
+
 ## Handling Variants
 
 Blocks can have variant classes applied (e.g., `<div class="my-block dark">`). Check for variants using `classList`:

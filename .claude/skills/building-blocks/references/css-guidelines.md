@@ -11,7 +11,7 @@
 .my-block {
   padding: 1rem;
 
-  h2 {
+  & h2 {
     font-size: var(--heading-font-size-m);
   }
 }
@@ -59,7 +59,7 @@ The platform automatically adds `.{block-name}-wrapper` and `.{block-name}-conta
 
 /* ✅ Better - use a name that cannot be confused with the platform's */
 .my-block {
-  .inner-wrapper {
+  & .inner-wrapper {
     padding: 2rem;
   }
 }
@@ -73,9 +73,9 @@ Native nesting is supported by all current browsers (Chrome 120+, Safari 17.2+, 
 
 **Rules:**
 - **Nest at most 3 levels deep** (root, element, state/variant). Flatten anything deeper with a class.
-- **Use `&` when attaching to the same element**: variants (`&.dark`), states (`&:hover`, `&:focus-visible`, `&[aria-expanded='true']`), and pseudo-elements (`&::before`).
-- **Descendants can be written without `&`** (`.item`, `h2`, `a`). Write `& .item` only if it reads more clearly.
+- **Every nested rule starts with `&`.** Attach to the same element with `&.dark`, `&:hover`, `&:focus-visible`, `&[aria-expanded='true']`, `&::before`. Target descendants with `& .item`, `& h2`, `& > li`. Never write a bare nested selector (`.item`, `h2`, `> li`). A bare selector like `a:any-link { }` or `h2 { color: red; }` can be mistaken for a property declaration, which breaks syntax highlighting and color previews in many editors. A leading `&` is unambiguous.
 - **Nest media queries inside the rule they modify**, not in a separate block at the bottom.
+- **Mobile-first, always.** The declarations in a rule are the mobile styles. Add larger screens only with `min-width` range syntax, `@media (width >= 600px)` then `@media (width >= 900px)`, nested in the rule they change. Never use `max-width`/`width <=` queries and never write desktop styles first and undo them for mobile.
 - **Never use `&` as a suffix builder** (`&-title`). It is not valid CSS and does not concatenate like Sass.
 - Keep one root rule per file. If you need a second top-level rule, it probably belongs to a different block.
 
@@ -86,7 +86,7 @@ Native nesting is supported by all current browsers (Chrome 120+, Safari 17.2+, 
   padding: 1rem;
 
   /* element */
-  .item {
+  & .item {
     padding: 1rem;
 
     /* state on a nested element */
@@ -95,7 +95,7 @@ Native nesting is supported by all current browsers (Chrome 120+, Safari 17.2+, 
     }
   }
 
-  .item-title {
+  & .item-title {
     font-family: var(--heading-font-family);
     font-size: var(--heading-font-size-s);
   }
@@ -124,7 +124,7 @@ Native nesting is supported by all current browsers (Chrome 120+, Safari 17.2+, 
 
 **Gotchas:**
 - Declarations that come *after* a nested rule still apply to the parent, but keep all declarations first, then nested rules, for readability.
-- The nested `@media` wraps the **parent's** declarations. It needs no selector when it only changes the root. For a child, nest the media query inside the child.
+- The nested `@media` wraps the **parent's** declarations. It needs no selector when it only changes the root. For a child, nest the media query inside the child (`& .item { @media (width >= 900px) { ... } }`).
 - Nested rules add the parent's specificity: `.my-block .item:hover` (0,3,0). Do not stack more levels just to win a fight. Fix the cause.
 - Search tools cannot find a nested selector by its full text (`.my-block .item`). Search for the class name alone.
 
@@ -136,11 +136,11 @@ Use descriptive kebab-case class names for elements within your block:
 .my-block {
   /* block styles */
 
-  .item {
+  & .item {
     /* item styles */
   }
 
-  .item-title {
+  & .item-title {
     /* item title styles */
   }
 
@@ -170,7 +170,7 @@ Leverage CSS custom properties defined in `styles/styles.css` for consistency:
   background-color: var(--background-color);
   color: var(--text-color);
 
-  a:any-link {
+  & a:any-link {
     color: var(--link-color);
 
     &:hover {
@@ -183,12 +183,12 @@ Leverage CSS custom properties defined in `styles/styles.css` for consistency:
 **Typography:**
 ```css
 .my-block {
-  h2 {
+  & h2 {
     font-family: var(--heading-font-family);
     font-size: var(--heading-font-size-m);
   }
 
-  p {
+  & p {
     font-family: var(--body-font-family);
     font-size: var(--body-font-size-m);
   }
@@ -235,7 +235,7 @@ Write styles mobile-first, then add nested media queries for larger screens:
 ```
 
 **Standard breakpoints:**
-- Mobile: default (< 600px)
+- Mobile: default (no query; this is what the base declarations are for)
 - Tablet: `@media (width >= 600px)`
 - Desktop: `@media (width >= 900px)`
 
@@ -290,11 +290,11 @@ Avoid overly specific selectors. Nesting makes it easy to write deep chains by a
 **✅ Good - low specificity:**
 ```css
 .my-block {
-  .item {
+  & .item {
     padding: 1rem;
   }
 
-  .item-title {
+  & .item-title {
     font-size: 1.5rem;
   }
 }
@@ -303,11 +303,11 @@ Avoid overly specific selectors. Nesting makes it easy to write deep chains by a
 **❌ Bad - high specificity:**
 ```css
 .my-block {
-  div div div.item {
+  & div div div.item {
     padding: 1rem;
   }
 
-  > div > h2.item-title {
+  & > div > h2.item-title {
     font-size: 1.5rem;
   }
 }
@@ -409,7 +409,7 @@ Test every variant for contrast and focus visibility (see accessibility-testing)
 ### Reset list styles
 ```css
 .my-block {
-  ul {
+  & ul {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -428,7 +428,7 @@ Test every variant for contrast and focus visibility (see accessibility-testing)
 ### Aspect ratio containers
 ```css
 .my-block {
-  .video-container {
+  & .video-container {
     aspect-ratio: 16 / 9;
   }
 }
@@ -437,7 +437,7 @@ Test every variant for contrast and focus visibility (see accessibility-testing)
 ### Truncate text
 ```css
 .my-block {
-  .truncated {
+  & .truncated {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -448,8 +448,8 @@ Test every variant for contrast and focus visibility (see accessibility-testing)
 ### Visible focus
 ```css
 .my-block {
-  a,
-  button {
+  & a,
+  & button {
     &:focus-visible {
       outline: 2px solid currentcolor;
       outline-offset: 2px;
@@ -461,7 +461,7 @@ Test every variant for contrast and focus visibility (see accessibility-testing)
 ### Reduced motion
 ```css
 .my-block {
-  .item {
+  & .item {
     @media (prefers-reduced-motion: no-preference) {
       transition: transform 0.2s;
     }
