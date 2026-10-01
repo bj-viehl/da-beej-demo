@@ -7,7 +7,7 @@ AEM Edge Delivery Services site authored in **da.live** (document-based authorin
 Any block, style, or script change follows the `content-driven-development` skill (`.claude/skills/`). Do not write code before test content exists in DA (previewed) or as a local draft.
 
 **A change is not done until:**
-1. `npm run lint` passes (see note on pre-existing errors below)
+1. `npm run lint` passes (CI runs it; JS and CSS)
 2. `npm run test:a11y` passes with zero axe violations at mobile/tablet/desktop for the block, plus one un-scoped page run (see `accessibility-testing` skill)
 3. Keyboard/focus behavior was checked for interactive blocks
 4. Authoring-side problems (missing alt text, heading levels, link text) are reported as DA content fixes, never papered over in JS or by disabling axe rules
@@ -38,4 +38,4 @@ Any block, style, or script change follows the `content-driven-development` skil
 
 - DA content is only visible locally after it has been **previewed**.
 - `.claude/skills/UPSTREAM.md` records where skills came from and what was changed locally.
-- Known lint errors outside this skills work: `scripts/sidekick.js` (`NX_ORIGIN` not exported from scripts.js); vendored `plugins/experimentation/tests/` (unresolved `monocart-coverage-reports`, and `@playwright/test` flagged as a devDependency now that it is installed).
+- `npm run lint` must pass (CI runs it on every push). `plugins/experimentation/tests/` is vendored upstream test code and is listed in `.eslintignore`.

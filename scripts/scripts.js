@@ -16,6 +16,9 @@ import {
   toCamelCase,
 } from './aem.js';
 
+/* origin of the DA "nx" tooling (used by sidekick.js and the experimentation plugin) */
+export const NX_ORIGIN = 'https://da.live/nx';
+
 /**
  * load fonts.css and set a session storage flag
  */
@@ -95,7 +98,6 @@ function decorateSections(main) {
  * Decorates the main element.
  * @param {Element} main The main element
  */
-// eslint-disable-next-line import/prefer-default-export
 export function decorateMain(main) {
   // hopefully forward compatible button decoration
   decorateButtons(main);
@@ -198,5 +200,5 @@ loadPage();
 
   const exp = searchParams.get('daexperiment');
   // eslint-disable-next-line import/no-unresolved
-  if (exp) import('https://da.live/nx/public/plugins/exp/exp.js');
+  if (exp) import(`${NX_ORIGIN}/public/plugins/exp/exp.js`);
 }());
