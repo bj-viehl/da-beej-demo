@@ -1,0 +1,4 @@
+{
+  "_comment": "DA pages to scan by default. Paths are served by `aem up` from da.live preview content. Override with A11Y_URLS=/path1,/path2",
+  "pages": ["/"]
+}

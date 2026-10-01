@@ -7,3 +7,13 @@ helix-importer-ui
 .DS_Store
 *.bak
 .idea
+test-results/
+playwright-report/
+
+# Local test content and scratch output (never commit)
+drafts/
+lighthouse-reports/
+screenshots/
+test-*.mjs
+test-my-block.js
+accessibility-tree.json

@@ -16,4 +16,16 @@ module.exports = {
     'no-param-reassign': [2, { props: false }], // allow modifying properties of param
     'import/no-cycle': 0, // Allow modules to use each other
   },
+  overrides: [
+    {
+      // Playwright/axe specs and config: devDependencies are fine,
+      // sequential awaits are intentional
+      files: ['test/**/*.js', 'playwright.config.js'],
+      rules: {
+        'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+        'no-restricted-syntax': 0,
+        'no-await-in-loop': 0,
+      },
+    },
+  ],
 };
