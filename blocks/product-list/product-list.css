@@ -1,4 +1,15 @@
 .product-list {
+  & .product-list-back {
+    display: inline-block;
+    margin-bottom: var(--size-16);
+    font-size: var(--small-font-size);
+
+    &:focus-visible {
+      outline: 2px solid currentcolor;
+      outline-offset: 2px;
+    }
+  }
+
   & .product-list-items {
     display: grid;
     grid-template-columns: 1fr;

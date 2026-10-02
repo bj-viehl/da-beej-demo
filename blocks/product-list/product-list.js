@@ -6,7 +6,24 @@ import {
 const DEFAULT_LIMIT = 12;
 const MAX_LIMIT = 100;
 const DEFAULT_PAGE = '/product-detail';
+const DEFAULT_BACK = '/products';
 const FIELDS = 'id,title,price,thumbnail,brand,rating';
+
+/**
+ * Creates the link back to the products page.
+ * @param {string} back the authored path of the products page
+ * @returns {Element} the link
+ */
+function createBackLink(back) {
+  const link = document.createElement('a');
+  link.className = 'product-list-back';
+  link.href = getPageHref(back, DEFAULT_BACK, {});
+
+  const arrow = createText('span', 'product-list-back-arrow', '←');
+  arrow.setAttribute('aria-hidden', 'true');
+  link.append(arrow, ' Back to products');
+  return link;
+}
 
 /**
  * Builds the request URL.
@@ -81,13 +98,14 @@ function createCard(product, page) {
  *   category | only show this category slug (e.g. laptops); empty shows all products
  *   limit    | number of products to show (default 12, max 100)
  *   page     | the product detail page the cards link to (default: /product-detail)
+ *   back     | the products page the "Back to products" link goes to (default: /products)
  * The author provides the H2 above the block (cards are H3).
  * @param {Element} block the block
  */
 export default async function decorate(block) {
   const config = readBlockConfig(block);
 
-  block.replaceChildren();
+  block.replaceChildren(createBackLink(config.back));
   block.setAttribute('aria-busy', 'true');
 
   try {
