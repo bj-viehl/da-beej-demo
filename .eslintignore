@@ -1,2 +1,4 @@
 helix-importer-ui
 plugins/experimentation/tests
+playwright-report
+test-results
