@@ -56,13 +56,42 @@ function select(categories, wanted) {
 }
 
 /**
+ * Adds the thumbnail of the first product in a category to its tile.
+ * The tile is already on the page, so a slow or failed request only leaves the image area empty.
+ * The image is decorative (alt="") because the tile text names the category.
+ * @param {string} source the products API base URL
+ * @param {string} slug the category slug
+ * @param {Element} media the tile's image area
+ */
+async function addImage(source, slug, media) {
+  try {
+    const url = new URL(`${source}/category/${encodeURIComponent(slug)}`, window.location.href);
+    url.searchParams.set('limit', 1);
+    url.searchParams.set('select', 'thumbnail');
+    const json = await fetchJson(url);
+    const [first] = json.products || json.data || [];
+    if (!first || !first.thumbnail) return;
+
+    const img = document.createElement('img');
+    img.src = first.thumbnail;
+    img.alt = '';
+    img.loading = 'lazy';
+    media.append(img);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.warn(`product-categories: no image for "${slug}"`, error);
+  }
+}
+
+/**
  * Content model (configuration block, 2 columns, all rows optional):
  *   source     | products API base URL (default: DummyJSON)
  *   path       | the folder the category pages live in (default: /products)
  *   categories | which categories to show, in this order, as comma separated names or
  *              | slugs (default: all categories from the API)
- * Each tile links to `{path}/{slug}`, for example /products/laptops. The category pages are
- * authored in DA; a tile for a category without a page leads to a 404. Place an H2 above the block.
+ * Each tile links to `{path}/{slug}`, for example /products/laptops, and shows the image of the
+ * first product in that category. The category pages are authored in DA; a tile for a category
+ * without a page leads to a 404. Place an H2 above the block.
  * @param {Element} block the block
  */
 export default async function decorate(block) {
@@ -72,7 +101,8 @@ export default async function decorate(block) {
   block.setAttribute('aria-busy', 'true');
 
   try {
-    const response = await fetchJson(`${getSource(config)}/categories`);
+    const source = getSource(config);
+    const response = await fetchJson(`${source}/categories`);
     const categories = Array.isArray(response) ? select(normalize(response), wanted) : [];
     if (!categories.length) {
       block.append(createText('p', 'product-categories-message', 'No categories found.'));
@@ -81,16 +111,23 @@ export default async function decorate(block) {
 
     const ul = document.createElement('ul');
     ul.className = 'product-categories-items';
-    categories.forEach(({ slug, name }) => {
+    const tiles = categories.map(({ slug, name }) => {
       const li = document.createElement('li');
       const link = document.createElement('a');
       link.className = 'product-categories-link';
       link.href = getChildHref(config.path, DEFAULT_PATH, slug);
-      link.textContent = name;
+
+      const media = document.createElement('span');
+      media.className = 'product-categories-media';
+      link.append(media, createText('span', 'product-categories-name', name));
       li.append(link);
       ul.append(li);
+      return { slug, media };
     });
     block.append(ul);
+
+    /* not awaited: the images fill in as they arrive */
+    tiles.forEach(({ slug, media }) => addImage(source, slug, media));
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Failed to load categories', error);

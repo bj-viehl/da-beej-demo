@@ -18,12 +18,11 @@
 
   & .product-categories-link {
     display: flex;
-    align-items: center;
-    min-height: var(--size-96);
-    padding: var(--size-24);
+    flex-direction: column;
+    overflow: hidden;
     border: 1px solid #dadada;
     border-radius: var(--border-radius);
-    background-color: var(--light-color);
+    background-color: var(--background-color);
     color: var(--text-color);
     font-family: var(--heading-font-family);
     font-size: var(--size-24);
@@ -36,7 +35,6 @@
 
     &:hover {
       border-color: var(--brand-primary-dark-color);
-      background-color: var(--background-color);
       color: var(--brand-primary-dark-color);
       text-decoration: none;
     }
@@ -45,6 +43,24 @@
       outline: 2px solid currentcolor;
       outline-offset: 2px;
     }
+  }
+
+  /* the area is always reserved, so tiles do not jump when images arrive */
+  & .product-categories-media {
+    display: block;
+    aspect-ratio: 4 / 3;
+    background-color: var(--light-color);
+
+    & img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  & .product-categories-name {
+    padding: var(--size-16) var(--size-24);
   }
 
   & .product-categories-message {
