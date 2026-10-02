@@ -1,6 +1,6 @@
 import { readBlockConfig } from '../../scripts/aem.js';
 import {
-  createText, fetchJson, formatPrice, getPageHref, getSource, slugToName,
+  createText, fetchJson, formatPrice, getPageHref, getSource,
 } from '../../scripts/products.js';
 
 const DEFAULT_LIMIT = 12;
@@ -78,30 +78,21 @@ function createCard(product, page) {
 /**
  * Content model (configuration block, 2 columns, all rows optional):
  *   source   | products API base URL (default: DummyJSON)
- *   category | only show this category slug; if omitted, `?category=` in the page URL is used
+ *   category | only show this category slug (e.g. laptops); empty shows all products
  *   limit    | number of products to show (default 12, max 100)
  *   page     | the product detail page the cards link to (default: /product-detail)
- * When the category comes from the page URL, the block adds an H2 with the category name.
- * Otherwise the author provides the H2 above the block.
+ * The author provides the H2 above the block (cards are H3).
  * @param {Element} block the block
  */
 export default async function decorate(block) {
   const config = readBlockConfig(block);
-  const urlCategory = new URLSearchParams(window.location.search).get('category');
-  const category = config.category || urlCategory;
 
   block.replaceChildren();
   block.setAttribute('aria-busy', 'true');
 
   try {
-    const json = await fetchJson(getRequestUrl(getSource(config), category, config.limit));
+    const json = await fetchJson(getRequestUrl(getSource(config), config.category, config.limit));
     const products = json.products || json.data || [];
-
-    if (!config.category && urlCategory) {
-      const name = slugToName(urlCategory);
-      block.append(createText('h2', 'product-list-heading', name));
-      document.title = name;
-    }
 
     if (!products.length) {
       block.append(createText('p', 'product-list-message', 'No products found.'));

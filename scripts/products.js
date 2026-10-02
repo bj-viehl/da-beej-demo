@@ -54,6 +54,20 @@ export function getPageHref(page, fallback, params) {
 }
 
 /**
+ * Builds a same-site link to a page under a base path (/products + beauty -> /products/beauty).
+ * Accepts an authored path or a full link; only the path is used.
+ * @param {string} base the authored base path or link
+ * @param {string} fallback the base path to use when nothing was authored
+ * @param {string} child the last path segment
+ * @returns {string} the link
+ */
+export function getChildHref(base, fallback, child) {
+  const target = typeof base === 'string' && base ? base : fallback;
+  const { pathname } = new URL(target, window.location.origin);
+  return `${pathname.replace(/\/$/, '')}/${encodeURIComponent(child)}`;
+}
+
+/**
  * Fetches JSON and throws on a failed request.
  * @param {string|URL} url the URL
  * @returns {Promise<Object>} the parsed JSON

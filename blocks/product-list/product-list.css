@@ -1,8 +1,4 @@
 .product-list {
-  & .product-list-heading {
-    margin-top: 0;
-  }
-
   & .product-list-items {
     display: grid;
     grid-template-columns: 1fr;

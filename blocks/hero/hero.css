@@ -75,6 +75,10 @@
     }
   }
 
+  &.compact {
+   --hero-padding-block: var(--section-padding-block);
+  }
+
   @media (width >= 600px) {
     & .hero-content > div{
       width: 65%;

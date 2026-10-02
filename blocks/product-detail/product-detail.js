@@ -1,9 +1,9 @@
 import { readBlockConfig } from '../../scripts/aem.js';
 import {
-  createText, fetchJson, formatPrice, getPageHref, getSource, slugToName,
+  createText, fetchJson, formatPrice, getChildHref, getPageHref, getSource, slugToName,
 } from '../../scripts/products.js';
 
-const DEFAULT_LIST_PAGE = '/product-list';
+const DEFAULT_LIST_PATH = '/products';
 
 /**
  * Creates a rating line: a visual "★ 4.2" plus a full sentence for screen readers.
@@ -151,16 +151,16 @@ function createReviews(reviews) {
 /**
  * Creates the product information column.
  * @param {Object} product the product data
- * @param {string} listPage the product list page
+ * @param {string} listPath the folder the category pages live in
  * @returns {Element} the column
  */
-function createInfo(product, listPage) {
+function createInfo(product, listPath) {
   const info = document.createElement('div');
   info.className = 'product-detail-info';
 
   const back = document.createElement('a');
   back.className = 'product-detail-back';
-  back.href = getPageHref(listPage, DEFAULT_LIST_PAGE, { category: product.category });
+  back.href = getChildHref(listPath, DEFAULT_LIST_PATH, product.category);
   back.textContent = `Back to ${slugToName(product.category)}`;
 
   info.append(back, createText('h1', 'product-detail-title', product.title));
@@ -185,7 +185,8 @@ function createInfo(product, listPage) {
 /**
  * Content model (configuration block, 2 columns, all rows optional):
  *   source    | products API base URL (default: DummyJSON)
- *   list-page | the product list page the back link goes to (default: /product-list)
+ *   list-path | the folder the category pages live in (default: /products); the back link
+ *               goes to {list-path}/{category}
  * The product comes from `?id=` in the page URL. The block renders the page's H1
  * (the product name) itself, so the page must not have an authored H1.
  * @param {Element} block the block
@@ -193,7 +194,7 @@ function createInfo(product, listPage) {
 export default async function decorate(block) {
   const config = readBlockConfig(block);
   const id = new URLSearchParams(window.location.search).get('id');
-  const listHref = getPageHref(config['list-page'], DEFAULT_LIST_PAGE, {});
+  const listHref = getPageHref(config['list-path'], DEFAULT_LIST_PATH, {});
   block.replaceChildren();
 
   const showMessage = (text) => {
@@ -216,7 +217,7 @@ export default async function decorate(block) {
     const product = await fetchJson(`${getSource(config)}/${encodeURIComponent(id)}`);
     document.title = product.title;
 
-    block.append(createGallery(product), createInfo(product, config['list-page']));
+    block.append(createGallery(product), createInfo(product, config['list-path']));
     if (product.reviews && product.reviews.length) block.append(createReviews(product.reviews));
   } catch (error) {
     // eslint-disable-next-line no-console
