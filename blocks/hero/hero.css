@@ -77,6 +77,7 @@
 
   &.compact {
    --hero-padding-block: var(--section-padding-block);
+   --hero-height: auto;
   }
 
   @media (width >= 600px) {
