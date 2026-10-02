@@ -2,7 +2,7 @@
   & .product-categories-items {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--size-16);
+    gap: var(--block-gap);
     margin: 0;
     padding: 0;
     list-style: none;
