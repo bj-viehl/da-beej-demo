@@ -38,6 +38,19 @@ export function getSource(config) {
 }
 
 /**
+ * Fades an image in once it has loaded. The block CSS hides `img.is-loading`.
+ * Call this after the image `src` is set.
+ * @param {HTMLImageElement} img the image
+ */
+export function fadeInImage(img) {
+  const done = () => img.classList.remove('is-loading');
+  if (img.complete && img.naturalWidth) return;
+  img.classList.add('is-loading');
+  img.addEventListener('load', done, { once: true });
+  img.addEventListener('error', done, { once: true });
+}
+
+/**
  * Builds a same-site link to another page with query parameters.
  * Accepts an authored path (/product-list) or a full link; only the path is used,
  * so the same content works on localhost, .aem.page and .aem.live.

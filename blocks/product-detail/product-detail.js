@@ -183,47 +183,120 @@ function createInfo(product, listPath) {
 }
 
 /**
+ * Creates a placeholder line (size set through CSS custom properties).
+ * @param {string} width the width, e.g. '60%'
+ * @param {string} height the height, e.g. '1.6rem'
+ * @returns {Element} the line
+ */
+function createSkeletonLine(width, height) {
+  const line = document.createElement('span');
+  line.className = 'product-detail-skeleton-line';
+  line.style.setProperty('--width', width);
+  line.style.setProperty('--height', height);
+  return line;
+}
+
+/**
+ * Creates placeholders for the gallery and the info column, in the same grid areas as the
+ * real content, so the page does not shift when the product arrives.
+ * Hidden from assistive technology.
+ * @returns {Element[]} the placeholders
+ */
+function createSkeleton() {
+  const gallery = document.createElement('div');
+  gallery.className = 'product-detail-gallery product-detail-skeleton';
+  const frame = document.createElement('div');
+  frame.className = 'product-detail-frame';
+  gallery.append(frame);
+
+  const info = document.createElement('div');
+  info.className = 'product-detail-info product-detail-skeleton';
+  [
+    ['25%', '1.4rem'], // back link
+    ['90%', '3.6rem'], ['60%', '3.6rem'], // title
+    ['30%', '1.8rem'], // brand
+    ['20%', '1.8rem'], // rating
+    ['45%', '3.2rem'], // price
+    ['25%', '1.8rem'], // availability
+    ['100%', '1.8rem'], ['100%', '1.8rem'], ['70%', '1.8rem'], // description
+    ['55%', '1.8rem'], ['55%', '1.8rem'], ['55%', '1.8rem'], // details
+  ].forEach(([width, height]) => info.append(createSkeletonLine(width, height)));
+
+  return [gallery, info].map((el) => {
+    el.setAttribute('aria-hidden', 'true');
+    return el;
+  });
+}
+
+/**
+ * Creates the message shown when there is no product to display.
+ * @param {string} text the message (the page H1)
+ * @param {string} listHref the link to the products page
+ * @returns {Element} the message
+ */
+function createMessage(text, listHref) {
+  const message = document.createElement('div');
+  message.className = 'product-detail-message';
+  const link = document.createElement('a');
+  link.href = listHref;
+  link.textContent = 'Browse all products';
+  message.append(createText('h1', 'product-detail-title', text), link);
+  return message;
+}
+
+/**
+ * Loads the product and swaps it in for the skeleton.
+ * @param {Element} block the block
+ * @param {Object} config the block configuration
+ * @param {string} id the product id
+ * @param {Element[]} skeleton the placeholders
+ * @param {string} listHref the link to the products page
+ */
+async function loadProduct(block, config, id, skeleton, listHref) {
+  try {
+    const product = await fetchJson(`${getSource(config)}/${encodeURIComponent(id)}`);
+    document.title = product.title;
+
+    const content = [createGallery(product), createInfo(product, config['list-path'])];
+    if (product.reviews && product.reviews.length) content.push(createReviews(product.reviews));
+    skeleton.forEach((el) => el.remove());
+    block.append(...content);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to load product', error);
+    skeleton.forEach((el) => el.remove());
+    block.append(createMessage(
+      error.status === 404 ? 'Product not found' : 'This product is unavailable right now',
+      listHref,
+    ));
+  } finally {
+    block.removeAttribute('aria-busy');
+  }
+}
+
+/**
  * Content model (configuration block, 2 columns, all rows optional):
  *   source    | products API base URL (default: DummyJSON)
  *   list-path | the folder the category pages live in (default: /products); the back link
  *               goes to {list-path}/{category}
  * The product comes from `?id=` in the page URL. The block renders the page's H1
  * (the product name) itself, so the page must not have an authored H1.
+ * The block is ready as soon as the skeleton is in place; the product loads afterwards
+ * (aria-busy is set until it arrives), so the request never delays the page.
  * @param {Element} block the block
  */
-export default async function decorate(block) {
+export default function decorate(block) {
   const config = readBlockConfig(block);
   const id = new URLSearchParams(window.location.search).get('id');
   const listHref = getPageHref(config['list-path'], DEFAULT_LIST_PATH, {});
-  block.replaceChildren();
-
-  const showMessage = (text) => {
-    const message = document.createElement('div');
-    message.className = 'product-detail-message';
-    const link = document.createElement('a');
-    link.href = listHref;
-    link.textContent = 'Browse all products';
-    message.append(createText('h1', 'product-detail-title', text), link);
-    block.append(message);
-  };
 
   if (!id) {
-    showMessage('No product selected');
+    block.replaceChildren(createMessage('No product selected', listHref));
     return;
   }
 
+  const skeleton = createSkeleton();
+  block.replaceChildren(...skeleton);
   block.setAttribute('aria-busy', 'true');
-  try {
-    const product = await fetchJson(`${getSource(config)}/${encodeURIComponent(id)}`);
-    document.title = product.title;
-
-    block.append(createGallery(product), createInfo(product, config['list-path']));
-    if (product.reviews && product.reviews.length) block.append(createReviews(product.reviews));
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Failed to load product', error);
-    showMessage(error.status === 404 ? 'Product not found' : 'This product is unavailable right now');
-  } finally {
-    block.removeAttribute('aria-busy');
-  }
+  loadProduct(block, config, id, skeleton, listHref);
 }

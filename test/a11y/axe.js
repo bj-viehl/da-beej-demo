@@ -17,6 +17,12 @@ export async function waitForDecoration(page, blockName) {
       return status === 'loaded';
     });
   }, blockName, { timeout: 15_000 });
+  // blocks that fetch data (product lists) are 'loaded' while still showing placeholders:
+  // wait for them to finish (aria-busy) and for their entrance animations to end
+  await page.waitForFunction(() => !document.querySelector('[aria-busy="true"]'), null, { timeout: 15_000 });
+  await page.waitForFunction(() => document.getAnimations()
+    .filter((a) => a.effect.getComputedTiming().iterations !== Infinity)
+    .every((a) => a.playState !== 'running'), null, { timeout: 15_000 });
   // header/footer load asynchronously after main
   await page.waitForLoadState('networkidle');
 }

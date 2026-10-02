@@ -1,10 +1,12 @@
 import { readBlockConfig } from '../../scripts/aem.js';
 import {
-  createText, fetchJson, formatPrice, getPageHref, getSource,
+  createText, fadeInImage, fetchJson, formatPrice, getPageHref, getSource,
 } from '../../scripts/products.js';
 
 const DEFAULT_LIMIT = 12;
 const MAX_LIMIT = 100;
+const MAX_SKELETONS = 12;
+const MAX_STAGGER = 8;
 const DEFAULT_PAGE = '/product-detail';
 const DEFAULT_BACK = '/products';
 const FIELDS = 'id,title,price,thumbnail,brand,rating';
@@ -26,6 +28,16 @@ function createBackLink(back) {
 }
 
 /**
+ * Gets the number of products to request.
+ * @param {*} limit the authored limit
+ * @returns {number} the limit, between 1 and the maximum
+ */
+function getLimit(limit) {
+  const requested = Number.parseInt(limit, 10) || DEFAULT_LIMIT;
+  return Math.min(Math.max(requested, 1), MAX_LIMIT);
+}
+
+/**
  * Builds the request URL.
  * @param {string} source the products API base URL
  * @param {string} category the category slug (optional)
@@ -34,12 +46,40 @@ function createBackLink(back) {
  */
 function getRequestUrl(source, category, limit) {
   const base = category ? `${source}/category/${encodeURIComponent(category)}` : source;
-  const requested = Number.parseInt(limit, 10) || DEFAULT_LIMIT;
-
   const url = new URL(base, window.location.href);
-  url.searchParams.set('limit', Math.min(Math.max(requested, 1), MAX_LIMIT));
+  url.searchParams.set('limit', getLimit(limit));
   url.searchParams.set('select', FIELDS);
   return url;
+}
+
+/**
+ * Creates placeholder cards, with the same layout as the real ones, so the page does not
+ * shift when the products arrive. Hidden from assistive technology.
+ * @param {number} count the number of placeholders
+ * @returns {Element} the list
+ */
+function createSkeleton(count) {
+  const ul = document.createElement('ul');
+  ul.className = 'product-list-items product-list-skeleton';
+  ul.setAttribute('aria-hidden', 'true');
+
+  for (let i = 0; i < count; i += 1) {
+    const li = document.createElement('li');
+    li.className = 'product-list-card';
+
+    const media = document.createElement('div');
+    media.className = 'product-list-media';
+
+    const body = document.createElement('div');
+    body.className = 'product-list-body';
+    ['title', 'brand', 'rating', 'price'].forEach((part) => {
+      body.append(createText('span', `product-list-skeleton-line product-list-skeleton-${part}`, ''));
+    });
+
+    li.append(media, body);
+    ul.append(li);
+  }
+  return ul;
 }
 
 /**
@@ -47,11 +87,13 @@ function getRequestUrl(source, category, limit) {
  * The whole card is clickable through the title link, so the image is decorative (alt="").
  * @param {Object} product the product data
  * @param {string} page the product detail page
+ * @param {number} index the position, used to stagger the entrance animation
  * @returns {Element} the list item
  */
-function createCard(product, page) {
+function createCard(product, page, index) {
   const li = document.createElement('li');
   li.className = 'product-list-card';
+  li.style.setProperty('--index', Math.min(index, MAX_STAGGER));
 
   const media = document.createElement('div');
   media.className = 'product-list-media';
@@ -59,6 +101,7 @@ function createCard(product, page) {
   img.src = product.thumbnail;
   img.alt = '';
   img.loading = 'lazy';
+  fadeInImage(img);
   media.append(img);
 
   const body = document.createElement('div');
@@ -93,6 +136,35 @@ function createCard(product, page) {
 }
 
 /**
+ * Loads the products and swaps them in for the skeleton.
+ * @param {Element} block the block
+ * @param {Object} config the block configuration
+ * @param {Element} skeleton the placeholder list
+ */
+async function loadProducts(block, config, skeleton) {
+  try {
+    const json = await fetchJson(getRequestUrl(getSource(config), config.category, config.limit));
+    const products = json.products || json.data || [];
+
+    if (!products.length) {
+      skeleton.replaceWith(createText('p', 'product-list-message', 'No products found.'));
+      return;
+    }
+
+    const ul = document.createElement('ul');
+    ul.className = 'product-list-items';
+    ul.append(...products.map((product, index) => createCard(product, config.page, index)));
+    skeleton.replaceWith(ul);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to load products', error);
+    skeleton.replaceWith(createText('p', 'product-list-message', 'Products are unavailable right now. Please try again later.'));
+  } finally {
+    block.removeAttribute('aria-busy');
+  }
+}
+
+/**
  * Content model (configuration block, 2 columns, all rows optional):
  *   source   | products API base URL (default: DummyJSON)
  *   category | only show this category slug (e.g. laptops); empty shows all products
@@ -100,32 +172,15 @@ function createCard(product, page) {
  *   page     | the product detail page the cards link to (default: /product-detail)
  *   back     | the products page the "Back to products" link goes to (default: /products)
  * The author provides the H2 above the block (cards are H3).
+ * The block is ready as soon as the skeleton is in place; the products load afterwards
+ * (aria-busy is set until they arrive), so the request never delays the page.
  * @param {Element} block the block
  */
-export default async function decorate(block) {
+export default function decorate(block) {
   const config = readBlockConfig(block);
+  const skeleton = createSkeleton(Math.min(getLimit(config.limit), MAX_SKELETONS));
 
-  block.replaceChildren(createBackLink(config.back));
+  block.replaceChildren(createBackLink(config.back), skeleton);
   block.setAttribute('aria-busy', 'true');
-
-  try {
-    const json = await fetchJson(getRequestUrl(getSource(config), config.category, config.limit));
-    const products = json.products || json.data || [];
-
-    if (!products.length) {
-      block.append(createText('p', 'product-list-message', 'No products found.'));
-      return;
-    }
-
-    const ul = document.createElement('ul');
-    ul.className = 'product-list-items';
-    ul.append(...products.map((product) => createCard(product, config.page)));
-    block.append(ul);
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Failed to load products', error);
-    block.append(createText('p', 'product-list-message', 'Products are unavailable right now. Please try again later.'));
-  } finally {
-    block.removeAttribute('aria-busy');
-  }
+  loadProducts(block, config, skeleton);
 }

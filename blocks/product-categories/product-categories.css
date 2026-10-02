@@ -29,8 +29,11 @@
     font-weight: 600;
     text-decoration: none;
 
+    /* tiles fade in and rise one after another (--index is set in the JS) */
     @media (prefers-reduced-motion: no-preference) {
       transition: var(--transition-type-all) var(--transition-speed) var(--transition-ease);
+      animation: fade-in-up 0.5s var(--transition-ease) both;
+      animation-delay: calc(var(--index, 0) * 70ms);
     }
 
     &:hover {
@@ -56,11 +59,45 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
+
+      @media (prefers-reduced-motion: no-preference) {
+        transition: opacity var(--transition-speed) var(--transition-ease);
+      }
+
+      &.is-loading {
+        opacity: 0;
+      }
     }
   }
 
   & .product-categories-name {
     padding: var(--size-16) var(--size-24);
+  }
+
+  & .product-categories-skeleton-line {
+    display: inline-block;
+    width: 60%;
+    height: 1em;
+    border-radius: 0.4rem;
+  }
+
+  /* placeholder tiles shown while the categories load; same layout as the real tiles */
+  & .product-categories-skeleton {
+    pointer-events: none;
+
+    & .product-categories-link {
+      animation: none;
+    }
+
+    & .product-categories-media,
+    & .product-categories-skeleton-line {
+      background: linear-gradient(90deg, var(--light-color) 25%, #ececec 50%, var(--light-color) 75%);
+      background-size: 200% 100%;
+
+      @media (prefers-reduced-motion: no-preference) {
+        animation: skeleton-shimmer 1.5s linear infinite;
+      }
+    }
   }
 
   & .product-categories-message {

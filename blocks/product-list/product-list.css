@@ -40,8 +40,11 @@
     border-radius: var(--border-radius);
     background-color: var(--background-color);
 
+    /* cards fade in and rise one after another (--index is set in the JS) */
     @media (prefers-reduced-motion: no-preference) {
       transition: box-shadow var(--transition-speed) var(--transition-ease);
+      animation: fade-in-up 0.5s var(--transition-ease) both;
+      animation-delay: calc(var(--index, 0) * 70ms);
     }
 
     &:hover {
@@ -58,7 +61,60 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
+
+      @media (prefers-reduced-motion: no-preference) {
+        transition: opacity var(--transition-speed) var(--transition-ease);
+      }
+
+      &.is-loading {
+        opacity: 0;
+      }
     }
+  }
+
+  & .product-list-skeleton-line {
+    display: block;
+    height: var(--size-16);
+    border-radius: 0.4rem;
+  }
+
+  /* placeholder cards shown while the products load; same layout as the real cards */
+  & .product-list-skeleton {
+    pointer-events: none;
+
+    & .product-list-card {
+      animation: none;
+    }
+
+    & .product-list-media,
+    & .product-list-skeleton-line {
+      background: linear-gradient(90deg, var(--light-color) 25%, #ececec 50%, var(--light-color) 75%);
+      background-size: 200% 100%;
+
+      @media (prefers-reduced-motion: no-preference) {
+        animation: skeleton-shimmer 1.5s linear infinite;
+      }
+    }
+  }
+
+  & .product-list-skeleton-title {
+    width: 80%;
+    height: var(--size-24);
+  }
+
+  & .product-list-skeleton-brand {
+    width: 45%;
+    height: var(--size-14);
+  }
+
+  & .product-list-skeleton-rating {
+    width: 30%;
+  }
+
+  & .product-list-skeleton-price {
+    width: 40%;
+    height: var(--size-20);
+    margin-top: auto;
   }
 
   & .product-list-body {

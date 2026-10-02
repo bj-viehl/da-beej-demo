@@ -139,3 +139,26 @@ main img {
     cursor: unset;
   }
 }
+
+/* loading animations, shared by the product blocks (keyframes cannot be nested in a block rule) */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.2rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes skeleton-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
