@@ -4,13 +4,15 @@
   --light-color: #f8f8f8;
   --dark-color: #505050;
   --text-color: #131313;
-  --primary-color: #3b63fb;
-  --secondary-color: #ff4081;
+  --brand-primary-color: #ff4081;
+  --brand-primary-dark-color: #b72254;
+  --brand-secondary-color: #3b63fb;
+  --brand-secondary-dark-color: #4228b9;
   --link-color: #3b63fb;
-  --link-hover-color: #1d3ecf;
-  --gradient-primary-color: rgb(59 99 251 / 60%);
-  --gradient-secondary-color: rgb(255 64 129 / 60%);
-  --gradient: linear-gradient(to right, var(--gradient-primary-color), var(--gradient-secondary-color));
+  --link-hover-color: #4228b9;
+  --gradient-primary-color: rgb(255 64 129 / 60%);
+  --gradient-secondary-color: rgb(59 99 251 / 60%);
+  --gradient: linear-gradient(to right, var(--gradient-secondary-color), var(--gradient-primary-color));
 
   /* fonts */
   --body-font-family: roboto, roboto-fallback, sans-serif;
@@ -60,8 +62,8 @@
   --border-radius: var(--size-24);
 
   /* buttons */
-  --button-color: var(--primary-color);
-  --button-color-hover: var(--link-color);
+  --button-color: var(--brand-primary-color);
+  --button-hover-color: var(--brand-primary-dark-color);
   --button-padding: var(--size-24);
   --button-border-radius: var(--border-radius);
   --button-height: var(--size-48);
@@ -74,6 +76,10 @@
   --transition-type-bg: background-color;
   --transition-type-color: color;
 
+  @media (width >= 600px) {
+    --button-width: auto;
+  }
+
   @media (width >= 900px) {
     --body-font-size: var(--size-16);
     --h1-font-size: var(--size-40);
@@ -84,7 +90,6 @@
     --h6-font-size: var(--size-16);
     --section-padding-block: var(--size-32);
     --block-gutter: var(--size-48);
-    --button-width: auto;
   }
 
   @media (width >= 1200px) {

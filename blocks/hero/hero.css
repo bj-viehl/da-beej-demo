@@ -5,9 +5,10 @@
 
 .hero {
   --hero-padding-block: var(--size-48);
-  --button-color: var(--secondary-color);
+  --hero-height: auto;
 
   position: relative;
+  height: var(--hero-height);
   padding-block: var(--hero-padding-block);
 
   & .hero-media {
@@ -16,7 +17,12 @@
     inset: 0;
     overflow: hidden;
 
-    & img {
+    & > div {
+      height: 100%;
+    }
+
+    & img,
+    & picture {
       object-position: center;
       object-fit: cover;
       width: 100%;
@@ -37,10 +43,8 @@
     padding-inline: var(--block-gutter);
     margin-inline: auto;
     display: flex;
-
-    & > div {
-      max-width: calc(var(--max-content-width) / 2);
-    }
+    height: 100%;
+    align-items: center;
 
     & h1,
     & p {
@@ -71,11 +75,22 @@
     }
   }
 
+  @media (width >= 600px) {
+    & .hero-content > div{
+      width: 65%;
+    }
+  }
+
   @media (width >= 900px) {
     --hero-padding-block: var(--size-72);
+
+    & .hero-content > div{
+      width: 50%;
+    }
   }
 
   @media (width >= 1200px) {
+    --hero-height: 90rem;
     --hero-padding-block: var(--size-96);
   }
 }

@@ -86,7 +86,7 @@ main img {
 .button-container {
   display: grid;
 
-  @media (width >= 900px) {
+  @media (width >= 600px) {
     display: flex;
   }
 }
@@ -98,7 +98,7 @@ main img {
   align-items: center;
   justify-content: center;
   margin: 12px 0;
-  border: 2px solid transparent;
+  border: 2px solid var(--button-color);
   border-radius: var(--button-border-radius);
   padding-inline: var(--button-padding);
   height: var(--button-height);
@@ -122,13 +122,12 @@ main img {
   }
 
   &.secondary {
-    border: 2px solid var(--button-color);
     color: var(--button-color);
   }
 
   &:hover,
   &:focus {
-    background-color: var(--link-hover-color);
+    background-color: var(--button-hover-color);
     cursor: pointer;
     color: var(--background-color);
     text-decoration: none;
