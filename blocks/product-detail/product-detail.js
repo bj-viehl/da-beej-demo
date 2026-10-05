@@ -2,6 +2,7 @@ import { readBlockConfig } from '../../scripts/aem.js';
 import {
   createText, fetchJson, formatPrice, getChildHref, getPageHref, getSource, slugToName,
 } from '../../scripts/products.js';
+import { addToCart, getCartHref } from '../../scripts/cart.js';
 
 const DEFAULT_LIST_PATH = '/products';
 
@@ -149,6 +150,38 @@ function createReviews(reviews) {
 }
 
 /**
+ * Creates the "Add to cart" button and its (screen reader) confirmation.
+ * @param {Object} product the product data
+ * @returns {Element} the purchase area
+ */
+function createPurchase(product) {
+  const purchase = document.createElement('div');
+  purchase.className = 'product-detail-purchase';
+
+  const button = createText('button', 'product-detail-add', 'Add to cart');
+  button.type = 'button';
+  if (product.availabilityStatus === 'Out of Stock') {
+    button.disabled = true;
+    button.textContent = 'Out of stock';
+  }
+
+  /* the live region exists before it has content, so the confirmation is announced */
+  const status = createText('p', 'product-detail-added', '');
+  status.setAttribute('role', 'status');
+
+  button.addEventListener('click', () => {
+    addToCart(product.id);
+    const link = document.createElement('a');
+    link.href = getCartHref();
+    link.textContent = 'View cart';
+    status.replaceChildren('Added to your cart. ', link);
+  });
+
+  purchase.append(button, status);
+  return purchase;
+}
+
+/**
  * Creates the product information column.
  * @param {Object} product the product data
  * @param {string} listPath the folder the category pages live in
@@ -175,6 +208,7 @@ function createInfo(product, listPath) {
   if (product.availabilityStatus) {
     info.append(createText('p', 'product-detail-availability', product.availabilityStatus));
   }
+  info.append(createPurchase(product));
   if (product.description) info.append(createText('p', 'product-detail-description', product.description));
 
   const specs = createSpecs(product);

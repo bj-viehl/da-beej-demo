@@ -1,5 +1,6 @@
 import { fetchPlaceholders, getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
+import decorateAccount from './account.js';
 
 // media query match that indicates mobile/tablet width
 const isDesktop = window.matchMedia('(min-width: 900px)');
@@ -217,6 +218,7 @@ export default async function decorate(block) {
     if (search && search.textContent === '') {
       search.setAttribute('aria-label', 'Search');
     }
+    decorateAccount(navTools);
   }
 
   // hamburger for mobile
