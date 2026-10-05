@@ -123,7 +123,7 @@ function createCard(product, page, index) {
     rating.className = 'product-list-rating';
     const stars = createText('span', 'product-list-stars', `★ ${product.rating.toFixed(1)}`);
     stars.setAttribute('aria-hidden', 'true');
-    rating.append(stars, createText('span', 'product-list-sr-only', `Rated ${product.rating.toFixed(1)} out of 5`));
+    rating.append(stars, createText('span', 'sr-only', `Rated ${product.rating.toFixed(1)} out of 5`));
     body.append(rating);
   }
 

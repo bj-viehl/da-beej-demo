@@ -103,9 +103,12 @@ Track your progress:
 
 3. Basic CSS structure:
    ```css
-   /* One root rule scoped to the block class; everything else is nested inside it */
+   /* One root rule scoped to the block class; everything else is nested inside it.
+      Block tokens come first and are the only place the block states a value. */
    .{block-name} {
-     /* block styles */
+     --{block-name}-gap: var(--block-gap);
+
+     /* block styles use var(--{block-name}-...) */
    }
    ```
 
@@ -159,7 +162,7 @@ This is a document-based site: authors control text, links, images, and heading 
 - **Use native elements first**: `<button>` for actions, `<a href>` for navigation, `<details>/<summary>` for disclosure. Do not put `click` handlers on `div`s.
 - **Widgets follow the ARIA APG pattern** (tabs, accordion, carousel, modal, menu): roles, `aria-selected`/`aria-expanded`/`aria-controls`, roving `tabindex`, arrow/Home/End/Esc keys, focus moves into a dialog on open and back to the trigger on close. Set state via attributes, not just classes, so assistive tech and CSS share one source of truth.
 - **Unique IDs.** Blocks repeat on a page; generate IDs with a counter or `crypto.randomUUID()` slice, never a fixed string.
-- **Accessible names** for icon-only buttons and carousels (`aria-label`, `aria-roledescription`), and `aria-live="polite"` for dynamic updates.
+- **Accessible names** for icon-only buttons and carousels (`aria-label`, `aria-roledescription`), and `aria-live="polite"` for dynamic updates. Text that only assistive technology needs (a rating sentence, a live-region message) gets the global `.sr-only` class, never a per-block copy of the hiding rules.
 - **Respect `prefers-reduced-motion`** for any animation, autoplay, or smooth scroll.
 - **Do not break the no-JS / pre-decoration state** more than necessary: LCP content should be readable before `decorate()` completes.
 
@@ -174,55 +177,62 @@ This is a document-based site: authors control text, links, images, and heading 
 
 ## Step 4: Add CSS Styling
 
-**Essential patterns - scoped to the block class, nested, responsive, using custom properties:**
+**Essential patterns - scoped to the block class, nested, mobile-first, built on design tokens:**
 
 ```css
 /* One root rule named for the block. No `main` prefix. Nest everything inside it. */
 .my-block {
-  /* Use CSS custom properties for consistency */
-  background-color: var(--background-color);
-  color: var(--text-color);
+  /* Block tokens first: the only place this block states a value.
+     They reference semantic tokens (or primitives) from styles/tokens.css. */
+  --my-block-background: var(--background-color);
+  --my-block-color: var(--text-color);
+  --my-block-padding: var(--size-16);
+  --my-block-gap: var(--block-gap);
+  --my-block-direction: column;
+
+  background-color: var(--my-block-background);
+  color: var(--my-block-color);
   font-family: var(--body-font-family);
   max-width: var(--max-content-width);
-
-  /* Mobile-first styles (default) */
-  padding: 1rem;
-  flex-direction: column;
+  padding: var(--my-block-padding);
+  flex-direction: var(--my-block-direction);
 
   & h2 {
     font-family: var(--heading-font-family);
-    font-size: var(--heading-font-size-m);
+    font-size: var(--h2-font-size);
   }
 
   & .item {
     display: flex;
-    gap: 1rem;
+    gap: var(--my-block-gap);
   }
 
-  /* Variants and states use & - most variants are CSS-only */
+  /* Variants change tokens; most variants are CSS-only */
   &.dark {
-    background-color: var(--dark-color);
-    color: var(--clr-white);
+    --my-block-background: var(--dark-color);
+    --my-block-color: var(--background-color);
   }
 
-  /* Tablet and up */
+  /* Mobile-first: breakpoints change the token, not the property */
   @media (width >= 600px) {
-    padding: 2rem;
+    --my-block-padding: var(--size-24);
   }
 
-  /* Desktop and up */
   @media (width >= 900px) {
-    flex-direction: row;
-    padding: 4rem;
+    --my-block-direction: row;
+    --my-block-padding: var(--size-48);
   }
 }
 ```
 
-Nesting rules: at most 3 levels, **every nested selector starts with `&`** (`& .item`, `& h2`, `&.dark`, `&:hover`; bare nested selectors break editor syntax highlighting), mobile-first with `min-width` range queries only (`@media (width >= 600px)`), media queries nested in the rule they change, one root rule per file (`header` and `footer` blocks use their landmark element as the root).
+Rules in one place:
+- **Nesting:** at most 3 levels, **every nested selector starts with `&`** (`& .item`, `& h2`, `&.dark`, `&:hover`; bare nested selectors break editor syntax highlighting), media queries nested in the rule they change, one root rule per file (`header` and `footer` blocks use their landmark element as the root).
+- **Mobile-first:** base declarations are mobile; larger screens use `min-width` range queries only (`@media (width >= 600px)`).
+- **Tokens:** no raw colors, spacing, radii, shadows or durations in properties. Reuse `styles/tokens.css`; add a semantic token there when two or more blocks need a value, otherwise a block token. Breakpoints and variants change token values. `npm run lint` fails on raw colors and on tokens that are used but not declared.
 
 **For complete CSS guidelines including:**
 - Block scoping and native nesting rules
-- All available CSS custom properties
+- The design token system (primitives, semantics, block tokens) and how to add tokens
 - Modern CSS features (grid, logical properties, etc.)
 - Performance optimization
 - Naming conventions

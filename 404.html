@@ -25,7 +25,7 @@
         const { origin, pathname } = new URL(document.referrer);
         if (origin === window.location.origin) {
           const backBtn = document.createElement('a');
-          backBtn.classList.add('button', 'error-button-back');
+          backBtn.classList.add('button', 'secondary', 'error-button-back');
           backBtn.href = pathname;
           backBtn.textContent = 'Go back';
           backBtn.title = 'Go back';
@@ -45,6 +45,7 @@
       min-height: calc(100vh - var(--header-height));
       display: flex;
       align-items: center;
+      justify-content: center;
     }
 
     main.error .error-number {
@@ -66,7 +67,7 @@
       </svg>
       <h2 class="error-message">Page Not Found</h2>
       <p class="button-container">
-        <a href="/" class="button secondary error-button-home">Go home</a>
+        <a href="/" class="button primary error-button-home">Go home</a>
       </p>
     </div>
   </main>

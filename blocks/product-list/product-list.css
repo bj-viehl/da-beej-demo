@@ -1,33 +1,48 @@
 .product-list {
+  --product-list-grid: 1fr;
+  --product-list-gap: var(--block-gap);
+  --product-list-card-border: var(--border);
+  --product-list-card-radius: var(--border-radius-card);
+  --product-list-card-background: var(--background-color);
+  --product-list-card-shadow: var(--shadow-raised);
+  --product-list-media-background: var(--light-color);
+  --product-list-body-padding: var(--size-16);
+  --product-list-body-gap: var(--size-14);
+  --product-list-text-size: var(--small-font-size);
+  --product-list-title-size: var(--size-20); /* card-sized; the heading tokens scale up to 4.8rem on desktop */
+  --product-list-price-size: var(--size-20);
+  --product-list-back-gap: var(--size-16);
+  --product-list-skeleton-radius: var(--size-4);
+
   & .product-list-back {
     display: inline-block;
-    margin-bottom: var(--size-16);
-    font-size: var(--small-font-size);
+    margin-bottom: var(--product-list-back-gap);
+    font-size: var(--product-list-text-size);
 
     &:focus-visible {
-      outline: 2px solid currentcolor;
-      outline-offset: 2px;
+      outline: var(--focus-outline);
+      outline-offset: var(--focus-outline-offset);
     }
   }
 
   & .product-list-items {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--block-gap);
+    grid-template-columns: var(--product-list-grid);
+    gap: var(--product-list-gap);
     margin: 0;
     padding: 0;
     list-style: none;
 
     @media (width >= 600px) {
-      grid-template-columns: repeat(2, 1fr);
+      --product-list-grid: repeat(2, 1fr);
     }
 
     @media (width >= 900px) {
-      grid-template-columns: repeat(3, 1fr);
+      --product-list-grid: repeat(3, 1fr);
     }
 
     @media (width >= 1200px) {
-      grid-template-columns: repeat(4, 1fr);
+      --product-list-grid: repeat(4, 1fr);
     }
   }
 
@@ -36,25 +51,25 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border: 1px solid #dadada;
-    border-radius: var(--border-radius);
-    background-color: var(--background-color);
+    border: var(--product-list-card-border);
+    border-radius: var(--product-list-card-radius);
+    background-color: var(--product-list-card-background);
 
     /* cards fade in and rise one after another (--index is set in the JS) */
     @media (prefers-reduced-motion: no-preference) {
-      transition: box-shadow var(--transition-speed) var(--transition-ease);
-      animation: fade-in-up 0.5s var(--transition-ease) both;
-      animation-delay: calc(var(--index, 0) * 70ms);
+      transition: var(--transition-type-box-shadow) var(--transition-speed) var(--transition-ease);
+      animation: var(--animation-fade-in-up);
+      animation-delay: calc(var(--index, 0) * var(--animation-stagger));
     }
 
     &:hover {
-      box-shadow: 0 4px 16px rgb(0 0 0 / 12%);
+      box-shadow: var(--product-list-card-shadow);
     }
   }
 
   & .product-list-media {
     aspect-ratio: 1;
-    background-color: var(--light-color);
+    background-color: var(--product-list-media-background);
 
     & img {
       display: block;
@@ -63,7 +78,7 @@
       object-fit: contain;
 
       @media (prefers-reduced-motion: no-preference) {
-        transition: opacity var(--transition-speed) var(--transition-ease);
+        transition: var(--transition-type-opacity) var(--transition-speed) var(--transition-ease);
       }
 
       &.is-loading {
@@ -75,7 +90,7 @@
   & .product-list-skeleton-line {
     display: block;
     height: var(--size-16);
-    border-radius: 0.4rem;
+    border-radius: var(--product-list-skeleton-radius);
   }
 
   /* placeholder cards shown while the products load; same layout as the real cards */
@@ -88,11 +103,10 @@
 
     & .product-list-media,
     & .product-list-skeleton-line {
-      background: linear-gradient(90deg, var(--light-color) 25%, #ececec 50%, var(--light-color) 75%);
-      background-size: 200% 100%;
+      background: var(--skeleton-background);
 
       @media (prefers-reduced-motion: no-preference) {
-        animation: skeleton-shimmer 1.5s linear infinite;
+        animation: var(--animation-skeleton-shimmer);
       }
     }
   }
@@ -121,13 +135,13 @@
     display: flex;
     flex: 1;
     flex-direction: column;
-    gap: var(--size-14);
-    padding: var(--size-16);
+    gap: var(--product-list-body-gap);
+    padding: var(--product-list-body-padding);
   }
 
   & .product-list-title {
     margin: 0;
-    font-size: var(--size-20); /* card-sized; the heading tokens scale up to 4.8rem on desktop */
+    font-size: var(--product-list-title-size);
   }
 
   /* stretch the title link over the whole card so the card is one click target */
@@ -141,8 +155,8 @@
     }
 
     &:focus-visible {
-      outline: 2px solid currentcolor;
-      outline-offset: 2px;
+      outline: var(--focus-outline);
+      outline-offset: var(--focus-outline-offset);
     }
   }
 
@@ -154,25 +168,13 @@
 
   & .product-list-brand {
     color: var(--dark-color);
-    font-size: var(--small-font-size);
+    font-size: var(--product-list-text-size);
   }
 
   & .product-list-price {
     margin-top: auto;
     font-weight: 700;
-    font-size: var(--size-20);
-  }
-
-  & .product-list-sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-    border: 0;
+    font-size: var(--product-list-price-size);
   }
 
   & .product-list-message {

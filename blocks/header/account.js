@@ -171,7 +171,7 @@ function createAccount() {
       renderSignedIn(panel, user);
     } else {
       /* an icon on small screens; the label stays available to screen readers */
-      button.replaceChildren(createIcon(USER_ICON), createText('span', 'nav-account-label', 'Sign in'));
+      button.replaceChildren(createIcon(USER_ICON), createText('span', 'nav-account-label sr-only', 'Sign in'));
       button.removeAttribute('aria-label');
       renderSignedOut(panel);
     }

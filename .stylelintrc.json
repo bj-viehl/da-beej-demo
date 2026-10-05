@@ -1,3 +1,19 @@
 {
-  "extends": ["stylelint-config-standard"]
+  "extends": ["stylelint-config-standard"],
+  "overrides": [
+    {
+      "files": ["blocks/**/*.css"],
+      "rules": {
+        "color-named": "never",
+        "declaration-property-value-disallowed-list": [
+          {
+            "/^(?!--).+/": ["/#[0-9a-f]{3,8}\\b/i", "/\\brgba?\\(/", "/\\bhsla?\\(/"]
+          },
+          {
+            "message": "Use a design token (a custom property) instead of a raw color in a block. Raw values belong in tokens.css or in a block token at the top of the block's root rule."
+          }
+        ]
+      }
+    }
+  ]
 }

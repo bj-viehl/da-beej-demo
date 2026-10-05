@@ -1,6 +1,8 @@
 # CSS Guidelines for AEM Blocks
 
-> **da.live project convention (differs from upstream adobe/skills):** block CSS is scoped by the **block class** (`.my-block`), not by a `main` prefix, and is written with **native CSS nesting**. See `../../UPSTREAM.md`.
+> **da.live project convention (differs from upstream adobe/skills):** block CSS is scoped by the **block class** (`.my-block`), not by a `main` prefix; it is written with **native CSS nesting**, **mobile-first**, and **design tokens** (no raw values in properties). See `../../UPSTREAM.md`.
+
+> **Placeholder values in examples:** the examples below that show raw numbers (`padding: 1rem`, `gap: 2rem`) illustrate selector structure, nesting and media queries only. In real block CSS every such value is a design token; see [Design Tokens](#design-tokens) for how, and the `Good`/`Bad` pairs there.
 
 ## Block Scoping
 
@@ -160,76 +162,118 @@ Use descriptive kebab-case class names for elements within your block:
 - Choose descriptive, semantic names
 - Avoid generic names like `.container`, `.wrapper` - be specific to your block
 
-## CSS Custom Properties (Variables)
+## Design Tokens
 
-Leverage CSS custom properties defined in `styles/styles.css` for consistency:
+Blocks never state raw design values (colors, spacing, radii, shadows, durations, font sizes) in their property declarations. Every value is a token. There are three layers:
 
-**Colors:**
+| Layer | Where it lives | Examples | Rule |
+|---|---|---|---|
+| **Primitives** | `styles/tokens.css` | `--size-16`, `--border-color`, `--brand-primary-color` | Raw scale values. Everything else is built on them. |
+| **Semantics** | `styles/tokens.css` | `--text-color`, `--border`, `--border-radius-card`, `--block-gutter`, `--focus-outline`, `--shadow-raised`, `--animation-fade-in-up` | Named by role, not by value; site-wide meaning. |
+| **Block tokens** | top of the block's root rule | `--cards-gap`, `--hero-padding-block` | What this block lets vary. They reference a semantic token, or a primitive when no semantic one fits. |
+
+**Read `styles/tokens.css` before writing block CSS and reuse what is there.** If the project has no tokens from a design system (no Figma tokens), create them: a primitive for a new scale step, a semantic token for a role, a block token for anything specific to one block.
+
+**✅ Good - block tokens first, properties use them, breakpoints and variants change the tokens:**
 ```css
-.my-block {
-  background-color: var(--background-color);
-  color: var(--text-color);
+.promo {
+  /* block tokens: the only place this block states a value */
+  --promo-columns: 1fr;
+  --promo-gap: var(--block-gap);
+  --promo-padding: var(--size-16);
+  --promo-border: var(--border);
+  --promo-radius: var(--border-radius-card);
+  --promo-background: var(--light-color);
 
-  & a:any-link {
-    color: var(--link-color);
+  display: grid;
+  grid-template-columns: var(--promo-columns);
+  gap: var(--promo-gap);
 
-    &:hover {
-      color: var(--link-hover-color);
-    }
+  & .promo-item {
+    padding: var(--promo-padding);
+    border: var(--promo-border);
+    border-radius: var(--promo-radius);
+    background-color: var(--promo-background);
+  }
+
+  /* responsive: change the token, not the property */
+  @media (width >= 600px) {
+    --promo-columns: repeat(2, 1fr);
+  }
+
+  @media (width >= 900px) {
+    --promo-columns: repeat(3, 1fr);
+  }
+
+  /* variants: change tokens, do not redeclare properties */
+  &.dark {
+    --promo-background: var(--dark-color);
   }
 }
 ```
 
-**Typography:**
+**❌ Bad - raw values, and the property is redeclared at every breakpoint:**
 ```css
-.my-block {
-  & h2 {
-    font-family: var(--heading-font-family);
-    font-size: var(--heading-font-size-m);
+.promo {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+
+  & .promo-item {
+    padding: 16px;
+    border: 1px solid #dadada;
+    border-radius: 24px;
   }
 
-  & p {
-    font-family: var(--body-font-family);
-    font-size: var(--body-font-size-m);
+  @media (width >= 600px) {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 ```
 
-**Layout:**
-```css
-.my-block {
-  max-width: var(--max-content-width);
-  padding-inline: var(--inline-section-padding);
-}
-```
+**Rules:**
+1. **Declare block tokens first**, at the top of the block's root rule (`header`/`footer` blocks use their landmark as the root). Name them `--{block}-{role}` in kebab-case (`--product-list-gap`).
+2. **Reference, do not restate.** A block token points at a semantic token if one has the right meaning, otherwise at a primitive (`var(--size-16)`). A raw value is allowed only when no token exists and the value is specific to this block (for example a 5.2rem toggle width); it lives in the block token, never inline in a property.
+3. **What needs a token:** colors, backgrounds, borders, radii, shadows, spacing (padding, margin, gap), sizes that vary, font sizes, transition and animation values, and anything that changes per breakpoint or variant. **What does not:** structural keywords and mechanics (`display`, `position`, flex/grid keywords, `0`, `auto`, `100%`, `inset: 0`), relative typographic units (`em`, `ch`), and decorative icon geometry (arrows, play triangles, hamburger bars). For text that only assistive technology needs, add the global `.sr-only` class in the JS; do not copy the visually-hidden rules into a block.
+4. **Responsive and variants change token values.** Set the token inside a nested `@media` (mobile-first) or inside `&.variant`; the property keeps using `var(--token)`. Put the media query in the rule that consumes the token when one element changes, on the root when many do.
+5. **Block tokens never reference another block's tokens.** They reference semantic or primitive tokens only.
+6. **Typography:** use the semantic font-size tokens (`--body-font-size`, `--small-font-size`, `--h1-font-size` to `--h6-font-size`). They already change per breakpoint, so do not add media queries for font size. Card-sized text is a block token pointing at a size primitive (`--card-title-size: var(--size-20)`), because the heading tokens scale up to very large sizes on desktop.
+7. **Missing token?** Used by two or more blocks, or has a site-wide meaning: add a semantic token to `styles/tokens.css` (and a primitive if the scale lacks the step). Used by one block: add a block token. Do not invent a token name without declaring it: `npm run lint` runs `lint:tokens`, which fails on any custom property that is used but never declared.
+8. **Raw colors are lint errors in blocks** (`npm run lint:css`): no hex, `rgb()`, `hsl()` or named colors in a property declaration. A color value belongs in `tokens.css` or in a block token declaration. `currentcolor` and `transparent` are fine.
+9. **Animation:** keyframes cannot be nested, so they live in `styles/styles.css`. Blocks use the `--animation-*` tokens (`animation: var(--animation-fade-in-up)`), and gate them in `@media (prefers-reduced-motion: no-preference)`.
+10. **The one allowed second top-level rule** is the wrapper opt-out for a full-bleed block (for example `.hero-container .hero-wrapper { max-width: unset; padding: 0; }`), written with no raw values.
+11. **Do not use removed or legacy tokens** (`--clr-*`, `--body-font-size-xs`, `--body-font-size-s`, `--body-font-size-m`, `--heading-font-size-*`). `lint:tokens` catches these.
 
-**Available custom properties:**
-- Colors: `--clr-*`, `--link-color`, `--background-color`, `--text-color`, etc.
-- Fonts: `--body-font-family`, `--heading-font-family`, `--fixed-font-family`
-- Font sizes: `--heading-font-size-*`, `--body-font-size-*`
-- Layout: `--max-content-width`, `--inline-section-padding`
-
-See `styles/styles.css` for the complete list.
+**Token groups in `styles/tokens.css`** (open the file for the current names and values):
+- **Colors:** `--background-color`, `--light-color`, `--dark-color`, `--text-color`, `--link-color`, `--brand-*`, `--border-color`, `--overlay-color`, `--error-color`, `--gradient`, `--skeleton-*`
+- **Fonts and sizes:** `--body-font-family`, `--heading-font-family`, `--brand-font-family`; `--size-*` primitives; `--body-font-size`, `--small-font-size`, `--h1-font-size` to `--h6-font-size`
+- **Spacing and layout:** `--block-gap`, `--block-gutter`, `--section-padding-block`, `--text-margin`, `--max-content-width`, `--touch-target`
+- **Borders and shadows:** `--border`, `--border-width`, `--border-width-thick`, `--border-radius*` (per component: `-card`, `-button`, `-input`, `-modal`, `-accordion`, `-media`), `--shadow-raised`, `--focus-outline`, `--focus-outline-offset`
+- **Motion:** `--transition-speed`, `--transition-speed-fast`, `--transition-ease`, `--transition-type-*`, `--animation-*`, `--animation-stagger`
+- **Buttons:** `--button-*`
 
 ## Mobile-First Responsive Design
 
-Write styles mobile-first, then add nested media queries for larger screens:
+Write styles mobile-first, then add nested media queries for larger screens. When a value changes with the screen size, the media query changes the **token**, and the property keeps using it:
 
 ```css
 .my-block {
-  /* Mobile styles (default) */
-  padding: 1rem;
-  flex-direction: column;
+  /* block tokens: mobile values (default) */
+  --my-block-padding: var(--size-16);
+  --my-block-direction: column;
+
+  padding: var(--my-block-padding);
+  flex-direction: var(--my-block-direction);
 
   /* Tablet and up */
   @media (width >= 600px) {
-    padding: 2rem;
+    --my-block-padding: var(--size-24);
   }
 
   /* Desktop and up */
   @media (width >= 900px) {
-    flex-direction: row;
-    padding: 4rem;
+    --my-block-direction: row;
+    --my-block-padding: var(--size-48);
   }
 }
 ```
@@ -321,28 +365,28 @@ Avoid overly specific selectors. Nesting makes it easy to write deep chains by a
 
 ## Handling Variants
 
-Use the variant class alongside the block class with `&`:
+Use the variant class alongside the block class with `&`, and let it **change tokens** (not redeclare properties):
 
 ```css
 .my-block {
   /* Base block */
-  background-color: var(--background-color);
-  color: var(--text-color);
+  --my-block-background: var(--background-color);
+  --my-block-color: var(--text-color);
+  --my-block-max-width: var(--max-content-width);
+
+  background-color: var(--my-block-background);
+  color: var(--my-block-color);
+  max-width: var(--my-block-max-width);
 
   /* Dark variant */
   &.dark {
-    background-color: var(--dark-color);
-    color: var(--clr-white);
+    --my-block-background: var(--dark-color);
+    --my-block-color: var(--background-color);
   }
 
   /* Wide variant */
   &.wide {
-    max-width: 100%;
-  }
-
-  /* Combining variants */
-  &.dark.wide {
-    /* Styles for both dark and wide */
+    --my-block-max-width: 100%;
   }
 }
 ```
@@ -451,19 +495,29 @@ Test every variant for contrast and focus visibility (see accessibility-testing)
   & a,
   & button {
     &:focus-visible {
-      outline: 2px solid currentcolor;
-      outline-offset: 2px;
+      outline: var(--focus-outline);
+      outline-offset: var(--focus-outline-offset);
     }
   }
 }
 ```
+
+### Visually hidden text (screen readers only)
+Use the global `.sr-only` utility from `styles/styles.css`; never re-create it in a block stylesheet.
+```javascript
+// in decorate(): the star icon is decorative, the sentence is what assistive technology reads
+const label = document.createElement('span');
+label.className = 'sr-only';
+label.textContent = 'Rated 4.5 out of 5';
+```
+A live region for announcements is the same class plus `role="status"` (create it empty first, then change its text). To show the text at a larger size, override only the properties you need to undo (`position`, `width`, `height`, `margin`, `overflow`, `clip-path`) in the block under a `min-width` query.
 
 ### Reduced motion
 ```css
 .my-block {
   & .item {
     @media (prefers-reduced-motion: no-preference) {
-      transition: transform 0.2s;
+      transition: var(--transition-type-transform) var(--transition-speed-fast) var(--transition-ease);
     }
   }
 }
@@ -502,20 +556,50 @@ header {
 }
 ```
 
-**❌ Don't hardcode values when variables exist:**
+**❌ Don't hardcode design values; use tokens:**
 ```css
-/* Bad */
+/* Bad: raw color, spacing, radius and duration (the color is also a lint error) */
 .my-block {
   font-family: 'Lato', sans-serif;
   color: #666;
+  padding: 16px;
+  border-radius: 24px;
+  transition: background-color 0.2s;
 }
+
+/* Good: block tokens that reference semantic tokens, used by the properties */
+.my-block {
+  --my-block-color: var(--dark-color);
+  --my-block-padding: var(--size-16);
+  --my-block-radius: var(--border-radius-card);
+
+  font-family: var(--body-font-family);
+  color: var(--my-block-color);
+  padding: var(--my-block-padding);
+  border-radius: var(--my-block-radius);
+  transition: var(--transition-type-bg) var(--transition-speed-fast) var(--transition-ease);
+}
+```
+
+**❌ Don't redeclare a property at every breakpoint or variant; change the token:**
+```css
+/* Bad */
+.my-block { gap: 16px; }
+@media (width >= 900px) { .my-block { gap: 32px; } }
 
 /* Good */
 .my-block {
-  font-family: var(--body-font-family);
-  color: var(--text-color);
+  --my-block-gap: var(--size-16);
+
+  gap: var(--my-block-gap);
+
+  @media (width >= 900px) {
+    --my-block-gap: var(--size-32);
+  }
 }
 ```
+
+**❌ Don't use a token that is not declared** (a typo, or a removed one such as `--body-font-size-s`). The declaration becomes invalid and the value silently falls back; `npm run lint` (`lint:tokens`) fails on it.
 
 **❌ Don't use absolute positioning for layout:**
 ```css

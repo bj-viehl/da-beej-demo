@@ -23,7 +23,18 @@ Any block, style, or script change follows the `content-driven-development` skil
 - **No `main` prefix** on block selectors.
 - Nest at most 3 levels. **Every nested selector starts with `&`**: `& .item`, `& h2`, `&.dark`, `&:hover` (bare nested selectors break editor syntax highlighting).
 - Mobile-first: base declarations are mobile; larger screens use nested `min-width` range queries only (`@media (width >= 900px)`), never `max-width`.
-- Details and examples: `.claude/skills/building-blocks/references/css-guidelines.md`. Existing boilerplate blocks predate this and are not yet converted.
+
+## Design tokens
+
+Blocks never state raw design values; everything is a token. Three layers:
+
+- **Primitives and semantics** live in `styles/tokens.css` (`--size-16`, `--border-color`, `--text-color`, `--border`, `--border-radius-card`, `--block-gutter`, `--focus-outline`, `--shadow-raised`, `--animation-fade-in-up`, ...). Read it first and reuse before adding. If there are no design tokens from Figma, create them.
+- **Block tokens** are declared at the top of the block's root rule, named `--{block}-{role}` (`--cards-gap`), and reference a semantic token (or a primitive when none fits). Properties use `var(--{block}-...)`.
+- **Responsive and variants change token values**, not properties: `@media (width >= 900px) { --cards-columns: repeat(3, 1fr); }`, `&.dark { --hero-background: ...; }`.
+- A value used by two or more blocks becomes a semantic token in `tokens.css`; a value specific to one block is a block token. Raw colors in blocks are lint errors, and `npm run lint` (`lint:tokens`) fails on any custom property that is used but never declared.
+- Visually hidden text uses the global `.sr-only` class (`styles/styles.css`); do not re-create it in a block.
+- Keyframes live in `styles/styles.css` (they cannot be nested); blocks use the `--animation-*` tokens behind `prefers-reduced-motion`. A block may add one extra top-level rule only to opt its platform wrapper out of section gutters (`.hero-container .hero-wrapper`).
+- Details, examples and the full rules: `.claude/skills/building-blocks/references/css-guidelines.md` (Design Tokens).
 
 ## Commands
 

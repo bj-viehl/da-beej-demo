@@ -1,41 +1,47 @@
 .cards {
-  --card-border-radius: var(--border-radius);
+  --cards-columns: 1fr;
+  --cards-gap: var(--block-gap);
+  --cards-border: var(--border);
+  --cards-radius: var(--border-radius-card);
+  --cards-background: var(--background-color);
+  --cards-image-ratio: 4 / 3;
+  --cards-body-margin: var(--size-16);
 
   & > ul {
-    list-style: none;
+    display: grid;
+    grid-template-columns: var(--cards-columns);
+    gap: var(--cards-gap);
     margin: 0;
     padding: 0;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--block-gap);
-
-    & > li {
-      border: 1px solid #dadada;
-      border-radius: var(--card-border-radius);
-      background-color: var(--background-color);
-
-      & img {
-        border-radius: var(--card-border-radius) var(--card-border-radius) 0 0;
-        aspect-ratio: 4 / 3;
-        object-fit: cover;
-      }
-    }
+    list-style: none;
 
     @media (width >= 600px) {
-      grid-template-columns: repeat(2, 1fr);
+      --cards-columns: repeat(2, 1fr);
     }
 
     @media (width >= 900px) {
-      grid-template-columns: repeat(3, 1fr);
+      --cards-columns: repeat(3, 1fr);
     }
 
     @media (width >= 1200px) {
-      grid-template-columns: repeat(4, 1fr);
+      --cards-columns: repeat(4, 1fr);
+    }
+
+    & > li {
+      border: var(--cards-border);
+      border-radius: var(--cards-radius);
+      background-color: var(--cards-background);
+
+      & img {
+        border-radius: var(--cards-radius) var(--cards-radius) 0 0;
+        aspect-ratio: var(--cards-image-ratio);
+        object-fit: cover;
+      }
     }
   }
 
   & .cards-card-body {
-    margin: 16px;
+    margin: var(--cards-body-margin);
   }
 
   & .cards-card-image {

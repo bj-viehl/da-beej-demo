@@ -156,7 +156,7 @@ export default function decorate(block) {
   let pendingFocus = null;
 
   /* announces changes to screen readers */
-  const status = createText('p', 'cart-status', '');
+  const status = createText('p', 'cart-status sr-only', '');
   status.setAttribute('role', 'status');
 
   const announce = (text) => {

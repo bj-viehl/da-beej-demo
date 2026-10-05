@@ -17,7 +17,7 @@ function createRating(rating, suffix = '') {
   p.className = 'product-detail-rating';
   const stars = createText('span', 'product-detail-stars', `★ ${rating.toFixed(1)}`);
   stars.setAttribute('aria-hidden', 'true');
-  p.append(stars, createText('span', 'product-detail-sr-only', `Rated ${rating.toFixed(1)} out of 5${suffix}`));
+  p.append(stars, createText('span', 'sr-only', `Rated ${rating.toFixed(1)} out of 5${suffix}`));
   return p;
 }
 
@@ -160,6 +160,8 @@ function createPurchase(product) {
 
   const button = createText('button', 'product-detail-add', 'Add to cart');
   button.type = 'button';
+  button.classList.add('button', 'primary');
+
   if (product.availabilityStatus === 'Out of Stock') {
     button.disabled = true;
     button.textContent = 'Out of stock';

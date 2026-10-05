@@ -152,6 +152,21 @@ element.disabled = true;
 | min-width only (`width >= N`) | HIGH | Never `max-width`/`width <=`; media queries nested in the rule they change |
 | All viewports tested | HIGH | Mobile, tablet, desktop |
 
+### Design Tokens
+
+| Check | Severity | Notes |
+|-------|----------|-------|
+| No raw colors in block property declarations | BLOCKING | hex, `rgb()`, `hsl()`, named colors only in `tokens.css` or a block token declaration (stylelint enforces) |
+| No undefined or removed custom properties | BLOCKING | `lint:tokens` fails on any `var(--x)` that is never declared (e.g. `--body-font-size-s`) |
+| Spacing, radius, border, shadow, font size, transition and animation come from tokens | HIGH | Raw `px`/`rem` only for decorative icon geometry, `em`/`ch` typographic units, the `1px` sr-only clip |
+| Block tokens declared first in the root rule, named `--{block}-{role}` | MEDIUM | e.g. `--cards-gap`; reference semantic tokens, or primitives when none fits |
+| Breakpoints and variants change token values, not the property | MEDIUM | `@media (width >= 900px) { --x-columns: ... }`, `&.dark { --x-background: ... }` |
+| Block tokens never reference another block's tokens | MEDIUM | Reference semantic or primitive tokens only |
+| Reused `styles/tokens.css` before adding a token; shared values became semantic tokens | MEDIUM | Two or more blocks need it: semantic token in `tokens.css`. One block: block token |
+| Keyframes live in `styles/styles.css`; blocks use `--animation-*` tokens behind `prefers-reduced-motion` | MEDIUM | `@keyframes` cannot be nested in a block rule |
+| Font sizes use the semantic font-size tokens, with no media queries just for font size | MEDIUM | Card-sized text is a block token pointing at a size primitive |
+| Screen-reader-only text uses the global `.sr-only` class | MEDIUM | No per-block copies of `clip-path: inset(50%)` and friends |
+
 ### Frameworks & Preprocessors
 
 | Check | Severity | Notes |

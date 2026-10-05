@@ -1,18 +1,30 @@
 .product-categories {
+  --product-categories-columns: 1fr;
+  --product-categories-gap: var(--block-gap);
+  --product-categories-border: var(--border);
+  --product-categories-radius: var(--border-radius-card);
+  --product-categories-background: var(--background-color);
+  --product-categories-media-background: var(--light-color);
+  --product-categories-ratio: 4 / 3;
+  --product-categories-name-size: var(--size-24);
+  --product-categories-name-padding: var(--size-16) var(--size-24);
+  --product-categories-hover-color: var(--brand-primary-dark-color);
+  --product-categories-skeleton-radius: var(--size-4);
+
   & .product-categories-items {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--block-gap);
+    grid-template-columns: var(--product-categories-columns);
+    gap: var(--product-categories-gap);
     margin: 0;
     padding: 0;
     list-style: none;
 
     @media (width >= 600px) {
-      grid-template-columns: repeat(2, 1fr);
+      --product-categories-columns: repeat(2, 1fr);
     }
 
     @media (width >= 900px) {
-      grid-template-columns: repeat(3, 1fr);
+      --product-categories-columns: repeat(3, 1fr);
     }
   }
 
@@ -20,39 +32,39 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border: 1px solid #dadada;
-    border-radius: var(--border-radius);
-    background-color: var(--background-color);
+    border: var(--product-categories-border);
+    border-radius: var(--product-categories-radius);
+    background-color: var(--product-categories-background);
     color: var(--text-color);
     font-family: var(--heading-font-family);
-    font-size: var(--size-24);
+    font-size: var(--product-categories-name-size);
     font-weight: 600;
     text-decoration: none;
 
     /* tiles fade in and rise one after another (--index is set in the JS) */
     @media (prefers-reduced-motion: no-preference) {
       transition: var(--transition-type-all) var(--transition-speed) var(--transition-ease);
-      animation: fade-in-up 0.5s var(--transition-ease) both;
-      animation-delay: calc(var(--index, 0) * 70ms);
+      animation: var(--animation-fade-in-up);
+      animation-delay: calc(var(--index, 0) * var(--animation-stagger));
     }
 
     &:hover {
-      border-color: var(--brand-primary-dark-color);
-      color: var(--brand-primary-dark-color);
+      border-color: var(--product-categories-hover-color);
+      color: var(--product-categories-hover-color);
       text-decoration: none;
     }
 
     &:focus-visible {
-      outline: 2px solid currentcolor;
-      outline-offset: 2px;
+      outline: var(--focus-outline);
+      outline-offset: var(--focus-outline-offset);
     }
   }
 
   /* the area is always reserved, so tiles do not jump when images arrive */
   & .product-categories-media {
     display: block;
-    aspect-ratio: 4 / 3;
-    background-color: var(--light-color);
+    aspect-ratio: var(--product-categories-ratio);
+    background-color: var(--product-categories-media-background);
 
     & img {
       display: block;
@@ -61,7 +73,7 @@
       object-fit: contain;
 
       @media (prefers-reduced-motion: no-preference) {
-        transition: opacity var(--transition-speed) var(--transition-ease);
+        transition: var(--transition-type-opacity) var(--transition-speed) var(--transition-ease);
       }
 
       &.is-loading {
@@ -71,14 +83,14 @@
   }
 
   & .product-categories-name {
-    padding: var(--size-16) var(--size-24);
+    padding: var(--product-categories-name-padding);
   }
 
   & .product-categories-skeleton-line {
     display: inline-block;
     width: 60%;
     height: 1em;
-    border-radius: 0.4rem;
+    border-radius: var(--product-categories-skeleton-radius);
   }
 
   /* placeholder tiles shown while the categories load; same layout as the real tiles */
@@ -91,11 +103,10 @@
 
     & .product-categories-media,
     & .product-categories-skeleton-line {
-      background: linear-gradient(90deg, var(--light-color) 25%, #ececec 50%, var(--light-color) 75%);
-      background-size: 200% 100%;
+      background: var(--skeleton-background);
 
       @media (prefers-reduced-motion: no-preference) {
-        animation: skeleton-shimmer 1.5s linear infinite;
+        animation: var(--animation-skeleton-shimmer);
       }
     }
   }

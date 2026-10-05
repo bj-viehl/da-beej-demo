@@ -6,6 +6,7 @@
 .hero {
   --hero-padding-block: var(--size-48);
   --hero-height: auto;
+  --hero-gradient: var(--gradient);
 
   position: relative;
   height: var(--hero-height);
@@ -33,7 +34,7 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: var(--gradient);
+      background: var(--hero-gradient);
       z-index: 0;
     }
   }

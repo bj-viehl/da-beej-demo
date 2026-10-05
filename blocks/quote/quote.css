@@ -1,41 +1,47 @@
-.quote blockquote {
-  margin: 0 auto;
-  padding: 0 24px;
-  max-width: 900px;
-}
+.quote {
+  --quote-max-width: 90rem;
+  --quote-padding-inline: var(--size-24);
+  --quote-font-size: 120%;
+  --quote-indent: -0.5ch;
+  --quote-attribution-gap: 0.5ch;
 
-@media (width >= 900px) {
-  .quote blockquote {
-    padding: 0 32px;
+  & blockquote {
+    margin: 0 auto;
+    padding: 0 var(--quote-padding-inline);
+    max-width: var(--quote-max-width);
+
+    @media (width >= 900px) {
+      --quote-padding-inline: var(--size-32);
+    }
+
+    & .quote-quotation {
+      font-size: var(--quote-font-size);
+
+      & > :first-child {
+        text-indent: var(--quote-indent);
+      }
+
+      & > :first-child::before,
+      & > :last-child::after {
+        line-height: 0;
+      }
+
+      & > :first-child::before {
+        content: "“";
+      }
+
+      & > :last-child::after {
+        content: "”";
+      }
+    }
+
+    & .quote-attribution {
+      text-align: right;
+
+      & > :first-child::before {
+        content: "—";
+        padding-right: var(--quote-attribution-gap);
+      }
+    }
   }
-}
-
-.quote blockquote .quote-quotation {
-  font-size: 120%;
-}
-
-.quote blockquote .quote-quotation > :first-child {
-  text-indent: -0.5ch;
-}
-
-.quote blockquote .quote-quotation > :first-child::before,
-.quote blockquote .quote-quotation > :last-child::after {
-  line-height: 0;
-}
-
-.quote blockquote .quote-quotation > :first-child::before {
-  content: "“";
-}
-
-.quote blockquote .quote-quotation > :last-child::after {
-  content: "”";
-}
-
-.quote blockquote .quote-attribution {
-  text-align: right;
-}
-
-.quote blockquote .quote-attribution > :first-child::before {
-  content: "—";
-  padding-right: 0.5ch;
 }

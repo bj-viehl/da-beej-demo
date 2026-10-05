@@ -1,10 +1,75 @@
 /* Mobile-first. Base declarations are mobile; larger screens are nested min-width queries.
    Single root (`header`, the landmark); every nested selector starts with &. */
 header {
+  /* layout */
+  --nav-height: 6.4rem;
+  --breadcrumbs-height: 3.4rem;
+  --header-height: var(--nav-height);
+  --header-max-width: var(--max-content-width);
+  --header-padding-inline: var(--size-16);
+  --header-gap: var(--size-12);
+  --header-box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+
+  /* hamburger */
+  --header-hamburger-button-size: 2.4rem;
+  --header-hamburger-icon-size: 2.2rem;
+  --header-hamburger-bar: 0.2rem;
+
+  /* brand and menu */
+  --header-brand-basis: 12.8rem;
+  --header-brand-font-size: var(--body-font-size);
+  --header-brand-color: var(--brand-primary-color);
+  --header-menu-font-size: var(--body-font-size);
+  --header-menu-gap: var(--size-24);
+  --header-chevron-size: 0.6rem;
+  --header-chevron-thickness: var(--border-width-thick);
+  --header-drop-width: 20rem;
+  --header-drop-padding: var(--size-16);
+  --header-drop-offset: calc(-1 * var(--size-24));
+  --header-drop-background: var(--light-color);
+  --header-drop-item-padding: var(--size-8);
+  --header-drop-arrow: var(--size-8);
+
+  /* tools, cart and account */
+  --header-tools-gap: var(--size-4);
+  --header-user-gap: var(--size-14);
+  --header-cart-padding: var(--size-8);
+  --header-cart-count-background: var(--brand-primary-dark-color);
+  --header-cart-count-color: var(--background-color);
+  --header-account-padding: 0.6rem var(--size-14);
+  --header-account-radius: var(--border-radius-button);
+  --header-avatar-size: 3.6rem;
+  --header-avatar-background: var(--brand-primary-dark-color);
+  --header-avatar-color: var(--background-color);
+  --header-panel-width: 28rem;
+  --header-panel-gap: var(--size-14);
+  --header-panel-padding: var(--size-16);
+  --header-panel-border: var(--border);
+  --header-panel-radius: var(--size-14);
+  --header-panel-shadow: var(--shadow-raised);
+  --header-action-background: var(--brand-primary-dark-color);
+  --header-action-color: var(--background-color);
+  --header-action-padding: var(--size-8) var(--size-16);
+
+  /* breadcrumbs */
+  --header-breadcrumbs-font-size: var(--body-font-size);
+  --header-breadcrumbs-color: var(--dark-color);
+
+  @media (width >= 400px) {
+    --header-padding-inline: var(--size-24);
+    --header-gap: var(--size-24);
+  }
+
+  @media (width >= 900px) {
+    --header-padding-inline: var(--block-gutter);
+    --header-gap: var(--block-gap);
+    --header-tools-gap: var(--size-16);
+  }
+
   /* header and nav layout */
   & .nav-wrapper {
     background-color: var(--background-color);
-    box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+    box-shadow: var(--header-box-shadow);
     width: 100%;
     z-index: 2;
     position: fixed;
@@ -17,17 +82,12 @@ header {
       'hamburger brand tools' var(--nav-height)
       'sections sections sections' 1fr / auto 1fr auto;
     align-items: center;
-    gap: 0 1.2rem;
+    gap: 0 var(--header-gap);
     margin: auto;
-    max-width: 1248px;
+    max-width: var(--header-max-width);
     height: var(--nav-height);
-    padding: 0 1.6rem;
+    padding: 0 var(--header-padding-inline);
     font-family: var(--body-font-family);
-
-    @media (width >= 400px) {
-      gap: 0 24px;
-      padding: 0 24px;
-    }
 
     &[aria-expanded='true'] {
       grid-template:
@@ -49,9 +109,7 @@ header {
     @media (width >= 900px) {
       display: flex;
       justify-content: space-between;
-      gap: var(--block-gap);
-      max-width: var(--max-content-width);
-      padding-inline: var(--block-gutter);
+      gap: var(--header-gap);
 
       &[aria-expanded='true'] {
         min-height: 0;
@@ -69,7 +127,7 @@ header {
   /* hamburger */
   & nav .nav-hamburger {
     grid-area: hamburger;
-    height: 22px;
+    height: var(--header-hamburger-button-size);
     display: flex;
     align-items: center;
 
@@ -80,7 +138,7 @@ header {
   }
 
   & nav .nav-hamburger button {
-    height: 22px;
+    height: var(--header-hamburger-button-size);
     margin: 0;
     border: 0;
     border-radius: 0;
@@ -99,7 +157,7 @@ header {
       box-sizing: border-box;
       display: block;
       position: relative;
-      width: 20px;
+      width: var(--header-hamburger-icon-size);
     }
 
     &::before,
@@ -114,37 +172,37 @@ header {
     &,
     &::before,
     &::after {
-      height: 2px;
-      border-radius: 2px;
+      height: var(--header-hamburger-bar);
+      border-radius: var(--header-hamburger-bar);
       background: currentcolor;
     }
 
     &::before {
-      top: -6px;
+      top: -0.6rem;
     }
 
     &::after {
-      top: 6px;
+      top: 0.6rem;
     }
   }
 
   & nav[aria-expanded='true'] .nav-hamburger-icon {
-    height: 22px;
+    height: var(--header-hamburger-icon-size);
 
     &::before,
     &::after {
-      top: 3px;
-      left: 1px;
+      top: 0.3rem;
+      left: 0.1rem;
       transform: rotate(45deg);
-      transform-origin: 2px 1px;
-      width: 24px;
-      height: 2px;
-      border-radius: 2px;
+      transform-origin: 0.2rem 0.1rem;
+      width: var(--header-hamburger-icon-size);
+      height: var(--header-hamburger-bar);
+      border-radius: var(--header-hamburger-bar);
     }
 
     &::after {
       top: unset;
-      bottom: 3px;
+      bottom: 0.3rem;
       transform: rotate(-45deg);
     }
   }
@@ -153,14 +211,14 @@ header {
   & .nav-brand {
     grid-area: brand;
     min-width: 0;
-    flex-basis: 128px;
+    flex-basis: var(--header-brand-basis);
     font-family: var(--brand-font-family);
-    font-size: var(--heading-font-size-s);
+    font-size: var(--header-brand-font-size);
     font-weight: 400; /* Oi has one very heavy weight; 700 would trigger faux bold */
     line-height: 1;
 
     & a {
-      color: var(--brand-primary-color);
+      color: var(--header-brand-color);
     }
   }
 
@@ -177,7 +235,7 @@ header {
   }
 
   & nav .nav-brand img {
-    width: 128px;
+    width: var(--header-brand-basis);
     height: auto;
   }
 
@@ -208,12 +266,12 @@ header {
   & nav .nav-sections ul {
     list-style: none;
     padding-left: 0;
-    font-size: var(--body-font-size-s);
+    font-size: var(--header-menu-font-size);
 
     @media (width >= 900px) {
       display: flex;
       align-items: center;
-      gap: 24px;
+      gap: var(--header-menu-gap);
       margin: 0;
     }
   }
@@ -233,7 +291,7 @@ header {
   & nav .nav-sections .nav-drop {
     @media (width >= 900px) {
       position: relative;
-      padding-right: 16px;
+      padding-right: var(--size-16);
       cursor: pointer;
 
       &::after {
@@ -241,13 +299,13 @@ header {
         display: inline-block;
         position: absolute;
         top: 0.5em;
-        right: 2px;
+        right: 0.2rem;
         transform: rotate(135deg);
-        width: 6px;
-        height: 6px;
-        border: 2px solid currentcolor;
-        border-radius: 0 1px 0 0;
-        border-width: 2px 2px 0 0;
+        width: var(--header-chevron-size);
+        height: var(--header-chevron-size);
+        border: var(--header-chevron-thickness) solid currentcolor;
+        border-radius: 0 0.1rem 0 0;
+        border-width: var(--header-chevron-thickness) var(--header-chevron-thickness) 0 0;
       }
 
       &[aria-expanded='true']::after {
@@ -270,11 +328,11 @@ header {
       &[aria-expanded='true'] > ul {
         display: block;
         position: absolute;
-        left: -24px;
-        width: 200px;
+        left: var(--header-drop-offset);
+        width: var(--header-drop-width);
         top: 150%;
-        padding: 16px;
-        background-color: var(--light-color);
+        padding: var(--header-drop-padding);
+        background-color: var(--header-drop-background);
         white-space: initial;
         z-index: 1;
       }
@@ -289,20 +347,20 @@ header {
       &::before {
         content: '';
         position: absolute;
-        top: -8px;
-        left: 16px;
+        top: calc(-1 * var(--header-drop-arrow));
+        left: var(--size-16);
         width: 0;
         height: 0;
-        border-left: 8px solid transparent;
-        border-right: 8px solid transparent;
-        border-bottom: 8px solid var(--light-color);
+        border-left: var(--header-drop-arrow) solid transparent;
+        border-right: var(--header-drop-arrow) solid transparent;
+        border-bottom: var(--header-drop-arrow) solid var(--header-drop-background);
       }
     }
   }
 
   & nav .nav-sections .default-content-wrapper > ul > li > ul > li {
     @media (width >= 900px) {
-      padding: 8px 0;
+      padding: var(--header-drop-item-padding) 0;
     }
   }
 
@@ -311,11 +369,7 @@ header {
     grid-area: tools;
     display: flex;
     align-items: center;
-    gap: 0.4rem;
-
-    @media (width >= 900px) {
-      gap: var(--size-16);
-    }
+    gap: var(--header-tools-gap);
   }
 
   & nav .nav-tools .button {
@@ -332,7 +386,7 @@ header {
   & .nav-user {
     display: flex;
     align-items: center;
-    gap: var(--size-14);
+    gap: var(--header-user-gap);
     max-width: none;
     margin-inline: 0;
     padding-inline: 0;
@@ -341,12 +395,12 @@ header {
   & .nav-cart {
     position: relative;
     display: inline-flex;
-    padding: 0.8rem;
+    padding: var(--header-cart-padding);
     color: var(--text-color);
 
     &:focus-visible {
-      outline: 2px solid currentcolor;
-      outline-offset: 2px;
+      outline: var(--focus-outline);
+      outline-offset: var(--focus-outline-offset);
     }
   }
 
@@ -357,8 +411,8 @@ header {
     min-width: 2rem;
     padding: 0 0.5rem;
     border-radius: 1rem;
-    background-color: var(--brand-primary-dark-color);
-    color: var(--background-color);
+    background-color: var(--header-cart-count-background);
+    color: var(--header-cart-count-color);
     font-size: 1.2rem;
     line-height: 2rem;
     text-align: center;
@@ -373,9 +427,9 @@ header {
     display: inline-flex;
     align-items: center;
     margin: 0;
-    padding: 0.6rem 1.4rem;
-    border: 1px solid currentcolor;
-    border-radius: 2.4rem;
+    padding: var(--header-account-padding);
+    border: var(--border-width) solid currentcolor;
+    border-radius: var(--header-account-radius);
     background-color: transparent;
     color: var(--text-color);
     font: inherit;
@@ -388,8 +442,8 @@ header {
     }
 
     &:focus-visible {
-      outline: 2px solid currentcolor;
-      outline-offset: 2px;
+      outline: var(--focus-outline);
+      outline-offset: var(--focus-outline-offset);
     }
 
     &.is-user {
@@ -398,16 +452,8 @@ header {
     }
   }
 
-  /* small screens: the "Sign in" button is an icon (the text is still read by screen readers) */
+  /* the label is .sr-only (hidden) on small screens, where the button is an icon; show it on desktop */
   & .nav-account-label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-
     @media (width >= 900px) {
       position: static;
       width: auto;
@@ -422,11 +468,11 @@ header {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 3.6rem;
-    height: 3.6rem;
+    width: var(--header-avatar-size);
+    height: var(--header-avatar-size);
     border-radius: 50%;
-    background-color: var(--brand-primary-dark-color);
-    color: var(--background-color);
+    background-color: var(--header-avatar-background);
+    color: var(--header-avatar-color);
     font-weight: 700;
     object-fit: cover;
   }
@@ -438,14 +484,14 @@ header {
     z-index: 3;
     display: flex;
     flex-direction: column;
-    gap: var(--size-14);
-    width: 28rem;
+    gap: var(--header-panel-gap);
+    width: var(--header-panel-width);
     max-width: calc(100vw - 3.2rem);
-    padding: var(--size-16);
-    border: 1px solid #dadada;
-    border-radius: var(--size-14);
+    padding: var(--header-panel-padding);
+    border: var(--header-panel-border);
+    border-radius: var(--header-panel-radius);
     background-color: var(--background-color);
-    box-shadow: 0 4px 16px rgb(0 0 0 / 12%);
+    box-shadow: var(--header-panel-shadow);
 
     &[hidden] {
       display: none;
@@ -472,22 +518,22 @@ header {
 
   & .nav-account-action {
     margin: 0;
-    padding: 0.8rem 1.6rem;
-    border: 2px solid var(--brand-primary-dark-color);
-    border-radius: 2.4rem;
-    background-color: var(--brand-primary-dark-color);
-    color: var(--background-color);
+    padding: var(--header-action-padding);
+    border: var(--border-width-thick) solid var(--header-action-background);
+    border-radius: var(--header-account-radius);
+    background-color: var(--header-action-background);
+    color: var(--header-action-color);
     font: inherit;
     font-weight: 500;
 
     &:hover {
-      background-color: var(--background-color);
-      color: var(--brand-primary-dark-color);
+      background-color: var(--header-action-color);
+      color: var(--header-action-background);
     }
 
     &:focus-visible {
-      outline: 2px solid currentcolor;
-      outline-offset: 2px;
+      outline: var(--focus-outline);
+      outline-offset: var(--focus-outline-offset);
     }
   }
 
@@ -495,16 +541,14 @@ header {
   & .breadcrumbs {
     display: none;
     margin: auto;
-    max-width: 1248px;
+    max-width: var(--header-max-width);
     height: var(--breadcrumbs-height);
-    padding: 0 24px;
-    font-size: var(--body-font-size-xs);
+    padding: 0 var(--header-padding-inline);
+    font-size: var(--header-breadcrumbs-font-size);
     overflow: hidden;
 
     @media (width >= 900px) {
       display: block;
-      max-width: 1264px;
-      padding: 0 32px;
     }
   }
 
@@ -521,7 +565,7 @@ header {
   /* stylelint-disable-next-line no-descending-specificity */
   & .breadcrumbs ol li {
     padding: 0;
-    color: var(--dark-color);
+    color: var(--header-breadcrumbs-color);
 
     &:not(:last-child)::after {
       content: '/';

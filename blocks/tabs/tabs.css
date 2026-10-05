@@ -1,58 +1,56 @@
-.tabs .tabs-list {
-  display: flex;
-  gap: 0.5ch;
-  max-width: 100%;
-  font-size: var(--body-font-size-xs);
-  overflow-x: auto;
-}
+.tabs {
+  --tabs-font-size: var(--body-font-size);
+  --tabs-border: var(--border);
+  --tabs-gap: 0.5ch;
+  --tabs-tab-padding: 0.5em;
+  --tabs-tab-background: var(--light-color);
+  --tabs-active-background: var(--background-color);
+  --tabs-panel-padding: var(--size-24);
+  --tabs-transition-duration: var(--transition-speed-fast);
 
-@media (width >= 600px) {
-  .tabs .tabs-list {
-    font-size: var(--body-font-size-s);
+  & .tabs-list {
+    display: flex;
+    gap: var(--tabs-gap);
+    max-width: 100%;
+    font-size: var(--tabs-font-size);
+    overflow-x: auto;
+
+    & button {
+      flex: 0 0 max-content;
+      margin: 0;
+      border: var(--tabs-border);
+      border-radius: 0;
+      padding: var(--tabs-tab-padding);
+      background-color: var(--tabs-tab-background);
+      color: initial;
+      font-weight: bold;
+      line-height: unset;
+      text-align: initial;
+      text-overflow: unset;
+      overflow: unset;
+      white-space: unset;
+      transition: var(--transition-type-bg) var(--tabs-transition-duration) var(--transition-ease);
+
+      & p {
+        margin: 0;
+      }
+
+      &[aria-selected='true'] {
+        border-bottom: var(--border-width) solid var(--tabs-active-background);
+        background-color: var(--tabs-active-background);
+        cursor: initial;
+      }
+    }
   }
-}
 
-@media (width >= 900px) {
-  .tabs .tabs-list {
-    font-size: var(--body-font-size-m);
+  & .tabs-panel {
+    margin-top: calc(-1 * var(--border-width));
+    padding: var(--tabs-panel-padding);
+    border: var(--tabs-border);
+    overflow: auto;
+
+    &[aria-hidden='true'] {
+      display: none;
+    }
   }
-}
-
-.tabs .tabs-list button {
-  flex: 0 0 max-content;
-  margin: 0;
-  border: 1px solid #dadada;
-  border-radius: 0;
-  padding: 0.5em;
-  background-color: var(--light-color);
-  color: initial;
-  font-weight: bold;
-  line-height: unset;
-  text-align: initial;
-  text-overflow: unset;
-  overflow: unset;
-  white-space: unset;
-  transition: background-color 0.2s;
-}
-
-.tabs .tabs-list button p {
-  margin: 0;
-}
-
-
-.tabs .tabs-list button[aria-selected='true'] {
-  border-bottom: 1px solid var(--background-color);
-  background-color: var(--background-color);
-  cursor: initial;
-}
-
-.tabs .tabs-panel {
-  margin-top: -1px;
-  padding: 24px;
-  border: 1px solid #dadada;
-  overflow: auto;
-}
-
-.tabs .tabs-panel[aria-hidden='true'] {
-  display: none;
 }

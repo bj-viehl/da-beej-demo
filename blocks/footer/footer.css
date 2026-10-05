@@ -1,20 +1,21 @@
 footer {
-  background-color: var(--light-color);
-  font-size: var(--body-font-size-xs);
-}
+  --footer-background: var(--light-color);
+  --footer-font-size: var(--body-font-size);
+  --footer-max-width: var(--max-content-width);
+  --footer-padding-inline: var(--block-gutter);
+  --footer-padding-top: var(--size-40);
+  --footer-padding-bottom: var(--size-24);
 
-footer .footer > div {
-  margin: auto;
-  max-width: 1200px;
-  padding: 40px 24px 24px;
-}
+  background-color: var(--footer-background);
+  font-size: var(--footer-font-size);
 
-footer .footer p {
-  margin: 0;
-}
+  & .footer > div {
+    margin: auto;
+    max-width: var(--footer-max-width);
+    padding: var(--footer-padding-top) var(--footer-padding-inline) var(--footer-padding-bottom);
+  }
 
-@media (width >= 900px) {
-  footer .footer > div {
-    padding: 40px 32px 24px;
+  & .footer p {
+    margin: 0;
   }
 }

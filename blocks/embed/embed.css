@@ -1,62 +1,73 @@
 .embed {
+  --embed-max-width: 80rem;
+  --embed-margin-block: var(--size-32);
+  --embed-radius: var(--border-radius-media);
+  --embed-ratio: 16 / 9;
+  --embed-play-size: 2.2rem;
+  --embed-play-scale: 3;
+  --embed-play-thickness: var(--border-width-thick);
+
   width: unset;
+  max-width: var(--embed-max-width);
+  margin: var(--embed-margin-block) auto;
   text-align: center;
-  max-width: 800px;
-  margin: 32px auto;
-}
 
-.embed > div {
-  display: flex;
-  justify-content: center;
-}
+  & > div {
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: var(--embed-radius);
+  }
 
-.embed.embed-twitter .twitter-tweet-rendered {
-  margin-left: auto;
-  margin-right: auto;
-}
+  &.embed-twitter .twitter-tweet-rendered {
+    margin-left: auto;
+    margin-right: auto;
+  }
 
-.embed .embed-placeholder {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  position: relative;
-}
+  & .embed-placeholder {
+    position: relative;
+    width: 100%;
+    aspect-ratio: var(--embed-ratio);
 
-.embed .embed-placeholder > * {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  inset: 0;
-}
+    & > * {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      inset: 0;
+    }
 
-.embed .embed-placeholder picture img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+    & picture img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
 
-.embed .embed-placeholder-play button {
-  box-sizing: border-box;
-  position: relative;
-  display: block;
-  transform: scale(3);
-  width: 22px;
-  height: 22px;
-  border: 2px solid;
-  border-radius: 20px;
-  padding: 0;
-}
+  /* play button: a circle with a triangle drawn by borders */
+  & .embed-placeholder-play button {
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    transform: scale(var(--embed-play-scale));
+    width: var(--embed-play-size);
+    height: var(--embed-play-size);
+    border: var(--embed-play-thickness) solid;
+    border-radius: 2rem;
+    padding: 0;
 
-.embed .embed-placeholder-play button::before {
-  content: "";
-  display: block;
-  box-sizing: border-box;
-  position: absolute;
-  width: 0;
-  height: 10px;
-  border-top: 5px solid transparent;
-  border-bottom: 5px solid transparent;
-  border-left: 6px solid;
-  top: 4px;
-  left: 7px;
+    &::before {
+      content: '';
+      display: block;
+      box-sizing: border-box;
+      position: absolute;
+      width: 0;
+      height: 1rem;
+      border-top: 0.5rem solid transparent;
+      border-bottom: 0.5rem solid transparent;
+      border-left: 0.6rem solid;
+      top: 0.4rem;
+      left: 0.7rem;
+    }
+  }
 }
